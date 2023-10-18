@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "514837950982",
+    "project_id": "weatherapi-8689a",
+    "storage_bucket": "weatherapi-8689a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514837950982:android:47a5c89ca534a596390987",
+        "android_client_info": {
+          "package_name": "com.example.weatherapi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjw0XqTUIQrhSITbNL_FqW6FY3hsEYWeI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
