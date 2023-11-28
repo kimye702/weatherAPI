@@ -136,5 +136,4 @@
                 android:textSize="14sp" />
         </TableRow>
     </TableLayout>
-
 </LinearLayout>

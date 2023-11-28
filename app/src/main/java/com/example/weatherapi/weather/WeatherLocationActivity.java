@@ -10,12 +10,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -30,11 +28,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapi.R;
+import com.example.weatherapi.finedust.FineDustActivity;
+import com.example.weatherapi.weather.adapter.HourWeatherSimpleAdapter;
+import com.example.weatherapi.weather.adapter.VeryShortWeatherDetailAdapter;
+import com.example.weatherapi.weather.model.ShortWeatherModel;
+import com.example.weatherapi.weather.model.VeryShortWeatherModel;
 import com.example.weatherapi.weather.util.Conversion;
-import com.example.weatherapi.weather.util.RequestPermission;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
@@ -46,6 +47,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -63,34 +65,40 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private LocationRequest mLocationRequest;
     private LocationSettingsRequest mLocationSettingsRequest;
 
-    private TextView tv_location;
     private TextView tv_date;
     private TextView tv_weather;
     private TextView tv_temprature;
-//    private Button btn_refresh;
-    private RecyclerView weatherRecyclerView;
+    private Button btn_finedust;
+    private Button btn_very_short_weather;
+    private RecyclerView rv_very_short;
+    private RecyclerView rv_hour_simple;
     private TextView locationText;
-
     private Point curPoint;
+
+    // 중기 예보에 필요한 쿼리 변수
+//    private String region_code;
+//    private String region;
 
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather_location);
+        setContentView(R.layout.activity_weather);
 
         init();
         checkLocation();
         requestLocation();
 
-        tv_location = findViewById(R.id.tv_location);
         tv_date = findViewById(R.id.tv_date);
         tv_weather = findViewById(R.id.tv_today_weather);
-        tv_temprature = findViewById(R.id.tv_today_temprature);
-//        btn_refresh = findViewById(R.id.btn_refresh);
+        tv_temprature = findViewById(R.id.tv_now_temp);
         locationText = findViewById(R.id.tv_location);
-        weatherRecyclerView = findViewById(R.id.rv_weather);
-        weatherRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        btn_finedust = findViewById(R.id.btn_finedust);
+        btn_very_short_weather = findViewById(R.id.btn_very_short_weather);
+//        rv_very_short = findViewById(R.id.rv_very_short);
+//        rv_very_short.setLayoutManager(new LinearLayoutManager(this));
+        rv_hour_simple = findViewById(R.id.rv_hour_simple);
+        rv_hour_simple.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         // 현재 시간을 가져옵니다.
         Calendar currentTime = Calendar.getInstance();
@@ -110,16 +118,28 @@ public class WeatherLocationActivity extends AppCompatActivity {
             amPm = "오전";
         }
 
-        // 날짜 텍스트를 설정합니다.
-//        tv_date.setText(formattedDate + " " + amPm + " " + hour + ":" + String.format(Locale.getDefault(), "%02d", minute));
         tv_date.setText(formattedDate);
-
-//        btn_refresh.setOnClickListener(v -> {
-//            requestLocation();
-//        });
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        btn_very_short_weather.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), VeryShortWeatherActivity.class);
+                intent.putExtra("y", String.valueOf(curPoint.y));
+                intent.putExtra("x", String.valueOf(curPoint.x));
+                startActivity(intent);
+            }
+        });
+
+        btn_finedust.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), FineDustActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 //     // 메뉴 리소스 XML의 내용을 앱바(App Bar)에 반영
@@ -135,78 +155,180 @@ public class WeatherLocationActivity extends AppCompatActivity {
         String timeH = new SimpleDateFormat("HH", Locale.getDefault()).format(cal.getTime());
         String timeM = new SimpleDateFormat("HH", Locale.getDefault()).format(cal.getTime());
         String base_time = getBaseTime(timeH, timeM);
+
         if (timeH.equals("00") && base_time.equals("2330")) {
             cal.add(Calendar.DATE, -1);
             base_date = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
         }
 
-        Call<WEATHER> call = ApiObject.retrofitService.GetWeather(60, 1, "JSON", base_date, base_time, nx, ny);
+        String base_date2 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
+        String base_time2 = getBaseTime2();
 
-        call.enqueue(new retrofit2.Callback<WEATHER>() {
+        if (timeH.equals("00")||timeH.equals("01")||timeH.equals("02") && base_time2.equals("2300")) {
+            cal.add(Calendar.DATE, -1);
+            base_date2 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
+        }
+
+//        Call<WEATHER> very_short_call = ApiObject.retrofitService.GetVeryShortTermWeather(60, 1, "JSON", base_date, base_time, nx, ny);
+        Call<WEATHER> short_call = ApiObject.retrofitService.GetShortTermWeather(1000, 1, "JSON", base_date2, base_time2, nx, ny);
+
+//        System.out.println("base date : " + base_date+"base time : "+base_time);
+//        System.out.println("base date : " + base_date+"base time2 : "+base_time2);
+
+//        // 초단기 예보 정보 받아오기
+//        very_short_call.enqueue(new retrofit2.Callback<WEATHER>() {
+//            @Override
+//            public void onResponse(@NonNull Call<WEATHER> call, @NonNull Response<WEATHER> response) {
+//                if (response.isSuccessful()) {
+//                    List<ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
+//
+//                    VeryShortWeatherModel[] weatherArr = new VeryShortWeatherModel[6];
+//
+//                    for (int i = 0; i < 6; i++) {
+//                        weatherArr[i] = new VeryShortWeatherModel();
+//                    }
+//
+//                    int index = 0;
+//                    int totalCount = response.body().response.body.totalCount - 1;
+////                    System.out.println("초단기예보 totalCount : "+totalCount);
+//                    for (int i = 0; i <= totalCount; i++) {
+//                        index %= 6;
+//                        switch (items.get(i).category) {
+//                            case "PTY": // 강수형태
+//                                weatherArr[index].setRainType(items.get(i).fcstValue);
+//                                break;
+//                            case "REH": // 습도
+//                                weatherArr[index].setHumidity(items.get(i).fcstValue);
+//                                break;
+//                            case "SKY": // 하늘상태
+//                                weatherArr[index].setSky(items.get(i).fcstValue);
+//                                break;
+//                            case "T1H": // 기온
+//                                weatherArr[index].setTemp(items.get(i).fcstValue);
+//                                break;
+//                            case "RN1": // 1시간 강수량
+//                                weatherArr[index].setHourRain(items.get(i).fcstValue);
+//                                break;
+//                            case "WSD": // 풍속
+//                                weatherArr[index].setWindSpeed(items.get(i).fcstValue);
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        index++;
+//                    }
+//
+//                    for (int i = 0; i <= 5; i++) {
+//                        String fcstTime = items.get(i).fcstTime;
+//                        String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
+//                        weatherArr[i].setFcstTime(formattedTime);
+//                    }
+//
+//                    String sky = weatherArr[0].getSky();
+//                    String weather;
+//                    switch (sky) {
+//                        case "1":
+//                            weather = "맑음";
+//                            break;
+//                        case "3":
+//                            weather = "구름 많음";
+//                            break;
+//                        case "4":
+//                            weather = "흐림";
+//                            break;
+//                        default:
+//                            weather = "오류 rainType : " + sky;
+//                            break;
+//                    }
+//
+//                    tv_weather.setText(weather);
+//                    tv_temprature.setText(weatherArr[0].getTemp());
+//
+//
+//                    rv_very_short.setAdapter(new VeryShortWeatherDetailAdapter(weatherArr));
+//
+//                    Toast.makeText(getApplicationContext(), "초단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void onFailure(@NonNull Call<WEATHER> call, @NonNull Throwable t) {
+//                Log.e("api fail", Objects.requireNonNull(t.getMessage()));
+//            }
+//        });
+
+        // 단기예보 api 정보 받아오기
+        short_call.enqueue(new retrofit2.Callback<WEATHER>() {
             @Override
             public void onResponse(@NonNull Call<WEATHER> call, @NonNull Response<WEATHER> response) {
                 if (response.isSuccessful()) {
+//                    System.out.println("response : "+response);
                     List<ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
 
-                    ModelWeather[] weatherArr = new ModelWeather[6];
-
-                    for (int i = 0; i < 6; i++) {
-                        weatherArr[i] = new ModelWeather();
-                    }
-
+                    int cnt = 0;
                     int index = 0;
                     int totalCount = response.body().response.body.totalCount - 1;
+
+                    int num = totalCount/12;
+
+                    ShortWeatherModel[] weatherArr = new ShortWeatherModel[num];
+
+                    for (int i = 0; i < num; i++) {
+                        weatherArr[i] = new ShortWeatherModel();
+                    }
+
+                    System.out.println("단기예보 totalCount : "+totalCount);
                     for (int i = 0; i <= totalCount; i++) {
-                        index %= 6;
                         switch (items.get(i).category) {
-                            case "PTY":
+                            case "POP": // 강수확률
+                                weatherArr[index].setRainPercent(items.get(i).fcstValue);
+                                break;
+                            case "PTY": // 강수형태
                                 weatherArr[index].setRainType(items.get(i).fcstValue);
                                 break;
-                            case "REH":
+                            case "PCP": // 1시간 강수량
+                                weatherArr[index].setHourRain(items.get(i).fcstValue);
+                                break;
+                            case "REH": // 습도
                                 weatherArr[index].setHumidity(items.get(i).fcstValue);
                                 break;
-                            case "SKY":
+                            case "SKY": // 하늘상태
                                 weatherArr[index].setSky(items.get(i).fcstValue);
                                 break;
-                            case "T1H":
-                                weatherArr[index].setTemp(items.get(i).fcstValue);
+                            case "TMP": // 1시간 기온
+                                weatherArr[index].setHourTemp(items.get(i).fcstValue);
+                                break;
+                            case "TMN": // 일 최저기온
+                                weatherArr[index].setLowTemp(items.get(i).fcstValue);
+                                cnt--;
+                                break;
+                            case "TMX": // 일 최고기온
+                                weatherArr[index].setHighTemp(items.get(i).fcstValue);
+                                cnt--;
+                                break;
+                            case "WSD": // 풍속
+                                weatherArr[index].setWindSpeed(items.get(i).fcstValue);
                                 break;
                             default:
                                 break;
                         }
-                        index++;
+                        cnt++;
+
+                        if(cnt%12==0&& !items.get(i).category.equals("TMX") && !items.get(i).category.equals("TMN"))
+                        {
+//                            System.out.println("fcstTime : "+items.get(i).fcstTime+"category : "+ items.get(i).category);
+                            String fcstTime = items.get(i).fcstTime;
+                            String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
+                            weatherArr[index].setFcstTime(formattedTime);
+                            index++;
+                        }
+
                     }
 
-                    for (int i = 0; i <= 5; i++) {
-                        String fcstTime = items.get(i).fcstTime;
-                        String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
-                        weatherArr[i].setFcstTime(formattedTime);
-                    }
+                    rv_hour_simple.setAdapter(new HourWeatherSimpleAdapter(weatherArr));
 
-                    String sky = weatherArr[0].getSky();
-                    String weather;
-                    switch (sky) {
-                        case "1":
-                            weather = "맑음";
-                            break;
-                        case "3":
-                            weather = "구름 많음";
-                            break;
-                        case "4":
-                            weather = "흐림";
-                            break;
-                        default:
-                            weather = "오류 rainType : " + sky;
-                            break;
-                    }
-
-                    tv_weather.setText(weather);
-                    tv_temprature.setText(weatherArr[0].getTemp());
-
-
-                    weatherRecyclerView.setAdapter(new WeatherAdapter(weatherArr));
-
-                    Toast.makeText(getApplicationContext(), items.get(0).fcstDate + ", " + items.get(0).fcstTime + "의 날씨 정보입니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -217,6 +339,191 @@ public class WeatherLocationActivity extends AppCompatActivity {
             }
         });
     }
+
+//    // 지역 코드 가져오기
+//    private void getRegionCode(){
+//
+//    }
+
+//    private void setMedWeather(String nx, String ny) {
+//        Calendar cal = Calendar.getInstance();
+//
+//        String base_date3 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
+//        String base_time3 = getBaseTime3();
+//
+//        if (base_time3.equals("-1800")) {
+//            cal.add(Calendar.DATE, -1);
+//            base_date3 = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
+//            base_time3 = "1800";
+//        }
+//
+//        Call<med_WEATHER> med_weather_call = ApiObject.retrofitService.GetMediumTermWeather(1000, 1, "JSON", region_code, base_date3+base_time3);
+//        Call<med_TEMP> med_temp_call = ApiObject.retrofitService.GetMediumTermTemp(1000, 1, "JSON", region_code, base_date3+base_time3);
+//
+//        // 초단기 예보 정보 받아오기
+//        med_weather_call.enqueue(new retrofit2.Callback<med_WEATHER>() {
+//            @Override
+//            public void onResponse(@NonNull Call<med_WEATHER> call, @NonNull Response<med_WEATHER> response) {
+//                if (response.isSuccessful()) {
+//                    List<med_weather_ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
+//
+//                    VeryShortWeatherModel[] weatherArr = new VeryShortWeatherModel[6];
+//
+//                    for (int i = 0; i < 6; i++) {
+//                        weatherArr[i] = new VeryShortWeatherModel();
+//                    }
+//
+//                    int index = 0;
+//                    int totalCount = response.body().response.body.totalCount - 1;
+////                    System.out.println("초단기예보 totalCount : "+totalCount);
+//                    for (int i = 0; i <= totalCount; i++) {
+//                        index %= 6;
+//                        switch (items.get(i).category) {
+//                            case "PTY": // 강수형태
+//                                weatherArr[index].setRainType(items.get(i).fcstValue);
+//                                break;
+//                            case "REH": // 습도
+//                                weatherArr[index].setHumidity(items.get(i).fcstValue);
+//                                break;
+//                            case "SKY": // 하늘상태
+//                                weatherArr[index].setSky(items.get(i).fcstValue);
+//                                break;
+//                            case "T1H": // 기온
+//                                weatherArr[index].setTemp(items.get(i).fcstValue);
+//                                break;
+//                            case "RN1": // 1시간 강수량
+//                                weatherArr[index].setHourRain(items.get(i).fcstValue);
+//                                break;
+//                            case "WSD": // 풍속
+//                                weatherArr[index].setWindSpeed(items.get(i).fcstValue);
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        index++;
+//                    }
+//
+//                    for (int i = 0; i <= 5; i++) {
+//                        String fcstTime = items.get(i).fcstTime;
+//                        String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
+//                        weatherArr[i].setFcstTime(formattedTime);
+//                    }
+//
+//                    String sky = weatherArr[0].getSky();
+//                    String weather;
+//                    switch (sky) {
+//                        case "1":
+//                            weather = "맑음";
+//                            break;
+//                        case "3":
+//                            weather = "구름 많음";
+//                            break;
+//                        case "4":
+//                            weather = "흐림";
+//                            break;
+//                        default:
+//                            weather = "오류 rainType : " + sky;
+//                            break;
+//                    }
+//
+//                    tv_weather.setText(weather);
+//                    tv_temprature.setText(weatherArr[0].getTemp());
+//
+//
+//                    rv_very_short.setAdapter(new VeryShortWeatherDetailAdapter(weatherArr));
+//
+//                    Toast.makeText(getApplicationContext(), "초단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void onFailure(@NonNull Call<med_WEATHER> call, @NonNull Throwable t) {
+//                Log.e("api fail", Objects.requireNonNull(t.getMessage()));
+//            }
+//        });
+//
+//        // 중기예보 기온 가져오기
+//        med_temp_call.enqueue(new retrofit2.Callback<med_TEMP>() {
+//            @Override
+//            public void onResponse(@NonNull Call<med_TEMP> call, @NonNull Response<med_TEMP> response) {
+//                if (response.isSuccessful()) {
+////                    System.out.println("response : "+response);
+//                    List<med_temp_ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
+//
+//                    int cnt = 0;
+//                    int index = 0;
+//                    int totalCount = response.body().response.body.totalCount - 1;
+//
+//                    int num = totalCount/12;
+//
+//                    ShortWeatherModel[] weatherArr = new ShortWeatherModel[num];
+//
+//                    for (int i = 0; i < num; i++) {
+//                        weatherArr[i] = new ShortWeatherModel();
+//                    }
+//
+//                    System.out.println("단기예보 totalCount : "+totalCount);
+//                    for (int i = 0; i <= totalCount; i++) {
+//                        switch (items.get(i).category) {
+//                            case "POP": // 강수확률
+//                                weatherArr[index].setRainPercent(items.get(i).fcstValue);
+//                                break;
+//                            case "PTY": // 강수형태
+//                                weatherArr[index].setRainType(items.get(i).fcstValue);
+//                                break;
+//                            case "PCP": // 1시간 강수량
+//                                weatherArr[index].setHourRain(items.get(i).fcstValue);
+//                                break;
+//                            case "REH": // 습도
+//                                weatherArr[index].setHumidity(items.get(i).fcstValue);
+//                                break;
+//                            case "SKY": // 하늘상태
+//                                weatherArr[index].setSky(items.get(i).fcstValue);
+//                                break;
+//                            case "TMP": // 1시간 기온
+//                                weatherArr[index].setHourTemp(items.get(i).fcstValue);
+//                                break;
+//                            case "TMN": // 일 최저기온
+//                                weatherArr[index].setLowTemp(items.get(i).fcstValue);
+//                                cnt--;
+//                                break;
+//                            case "TMX": // 일 최고기온
+//                                weatherArr[index].setHighTemp(items.get(i).fcstValue);
+//                                cnt--;
+//                                break;
+//                            case "WSD": // 풍속
+//                                weatherArr[index].setWindSpeed(items.get(i).fcstValue);
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                        cnt++;
+//
+//                        if(cnt%12==0&& !items.get(i).category.equals("TMX") && !items.get(i).category.equals("TMN"))
+//                        {
+////                            System.out.println("fcstTime : "+items.get(i).fcstTime+"category : "+ items.get(i).category);
+//                            String fcstTime = items.get(i).fcstTime;
+//                            String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
+//                            weatherArr[index].setFcstTime(formattedTime);
+//                            index++;
+//                        }
+//
+//                    }
+//
+//                    rv_hour_simple.setAdapter(new HourWeatherSimpleAdapter(weatherArr));
+//
+//                    Toast.makeText(getApplicationContext(), "단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @SuppressLint("SetTextI18n")
+//            @Override
+//            public void onFailure(@NonNull Call<med_TEMP> call, @NonNull Throwable t) {
+//                Log.e("api fail", Objects.requireNonNull(t.getMessage()));
+//            }
+//        });
+//    }
 
     @SuppressLint({"MissingPermission", "SetTextI18n"})
     private void requestLocation() {
@@ -231,6 +538,10 @@ public class WeatherLocationActivity extends AppCompatActivity {
                     if (!addressList.isEmpty()) {
                         Address address = addressList.get(0);
                         locationText.setText(address.getThoroughfare());
+//                        region = address.getAdminArea();
+//                        System.out.println("현재 지역 : "+region);
+//                        getRegionCode();
+//                        setMedWeather(String.valueOf(curPoint.x), String.valueOf(curPoint.y));
                     } else {
                         locationText.setText(location.getLatitude() + ", " + location.getLongitude());
                     }
@@ -272,6 +583,44 @@ public class WeatherLocationActivity extends AppCompatActivity {
 
         return result;
     }
+
+    private String getBaseTime2() {
+        String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis() - (1000 * 7200)));
+        String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
+        int check = ((Integer.parseInt(hour) / 3) * 3) + 2;
+
+        // 10분 미만
+        if((Integer.parseInt(hour)-2)%3==0&&Integer.parseInt(minute)<10)
+        {
+            check-=3;
+            if(check==-1)
+                check=23;
+        }
+
+        if(check<10)
+            hour = "0"+check+"00";
+        else
+            hour = check + "00";
+
+        return hour;
+    }
+
+    private String getBaseTime3() {
+        String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis()));
+        String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
+        int check = Integer.parseInt(hour);
+
+        if(check<6){ // 전날 18시
+            hour = "-1800";
+        }else if(check<18){ // 6시
+            hour = "0600";
+        }else if(check<23){ // 18시
+            hour = "1800";
+        }
+
+        return hour;
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

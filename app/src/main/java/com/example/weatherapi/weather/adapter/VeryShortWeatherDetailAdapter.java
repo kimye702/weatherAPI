@@ -1,4 +1,4 @@
-package com.example.weatherapi.weather;
+package com.example.weatherapi.weather.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,11 +9,13 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapi.R;
+import com.example.weatherapi.weather.model.VeryShortWeatherModel;
 
-public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHolder> {
-    private ModelWeather[] items;
+// 초단기 예보 활용 6시간이내 디테일
+public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShortWeatherDetailAdapter.ViewHolder> {
+    private VeryShortWeatherModel[] items;
 
-    public WeatherAdapter(ModelWeather[] items) {
+    public VeryShortWeatherDetailAdapter(VeryShortWeatherModel[] items) {
         this.items = items;
     }
 
@@ -21,13 +23,13 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View itemView = inflater.inflate(R.layout.list_item_weather, parent, false);
+        View itemView = inflater.inflate(R.layout.item_very_short_weather_detail, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        ModelWeather item = items[position];
+        VeryShortWeatherModel item = items[position];
         holder.setItem(item);
     }
 
@@ -54,7 +56,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
             tvRecommends = itemView.findViewById(R.id.tvRecommends);
         }
 
-        public void setItem(ModelWeather item) {
+        public void setItem(VeryShortWeatherModel item) {
             tvTime.setText(item.getFcstTime());
             tvRainType.setText(getRainType(item.getRainType()));
             tvHumidity.setText(item.getHumidity());

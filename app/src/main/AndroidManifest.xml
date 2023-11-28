@@ -43,7 +43,7 @@
 <!--                <category android:name="android.intent.category.LAUNCHER" />-->
 <!--            </intent-filter>-->
         </activity>
-        <activity android:name=".weather.LocationActivity"
+        <activity android:name=".weather.test.LocationActivity"
             android:exported="true">
 <!--            <intent-filter>-->
 <!--                <action android:name="android.intent.action.MAIN" />-->
@@ -54,11 +54,11 @@
         <activity android:name=".weather.WeatherLocationActivity"
             android:theme="@style/Theme.Design.NoActionBar"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".finedust_test.KakaoApiTest"
             android:exported="true">
@@ -70,11 +70,14 @@
         </activity>
         <activity android:name=".finedust.FineDustActivity"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
+                <activity android:name=".weather.VeryShortWeatherActivity"
+            android:exported="true">
         </activity>
     </application>
 

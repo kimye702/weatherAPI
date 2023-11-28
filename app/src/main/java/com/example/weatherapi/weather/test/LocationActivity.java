@@ -1,4 +1,4 @@
-package com.example.weatherapi.weather;
+package com.example.weatherapi.weather.test;
 
 import android.annotation.SuppressLint;
 import android.location.Address;
@@ -35,7 +35,7 @@ public class LocationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location);
+        setContentView(R.layout.activity_location_test);
 
         TextView locationText = findViewById(R.id.locationText);
         Button locationButton = findViewById(R.id.locationButton);
