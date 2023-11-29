@@ -145,6 +145,15 @@ public class FriendFragment extends Fragment {
                                         List<String> friendList = (List<String>) document.get("friendList");
                                         if (friendList == null) {
                                             friendList = new ArrayList<>();
+                                            friendList.add(friendUid);
+                                            document.getReference().update("friendList", friendList)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            friendAdapter.loadUserModels(); // 업데이트 호출
+                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
                                         }
                                         else if (!friendList.contains(friendUid)) {
                                             friendList.add(friendUid);
@@ -178,25 +187,26 @@ public class FriendFragment extends Fragment {
                                         List<String> friendList = (List<String>) document.get("friendList");
                                         if (friendList == null) {
                                             friendList = new ArrayList<>();
-                                        }
-                                        else if (!friendList.contains(userInfo.getUid())) {
                                             friendList.add(userInfo.getUid());
                                             document.getReference().update("friendList", friendList)
                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
-                                                            friendAdapter.loadUserModels(); // 업데이트 호출
-                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
                                                         }
                                                     });
-                                        } else {
-                                            Toast.makeText(getActivity(), "이미 추가된 친구입니다.", Toast.LENGTH_LONG).show();
+                                        }
+                                        else {
+                                            friendList.add(userInfo.getUid());
+                                            document.getReference().update("friendList", friendList)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                        }
+                                                    });
                                         }
                                     } else {
-                                        Toast.makeText(getActivity(), "존재하지 않는 친구코드에요!", Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-                                    Toast.makeText(getActivity(), "오류 발생: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });

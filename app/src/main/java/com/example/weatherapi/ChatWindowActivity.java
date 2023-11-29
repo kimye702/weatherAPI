@@ -58,6 +58,7 @@ public class ChatWindowActivity extends AppCompatActivity {
     private EditText editText;
     private Button sendButton;
     private String userName;
+    private TextView chatTitle;
 
     private String uid;
     private String friendUid;
@@ -81,12 +82,49 @@ public class ChatWindowActivity extends AppCompatActivity {
         friendUid=getIntent().getStringExtra("friendUid");
         editText = (EditText) findViewById(R.id.edt_message);
         sendButton = (Button) findViewById(R.id.btn_submit);
+        chatTitle=(TextView) findViewById(R.id.txt_Title);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
         firestore = FirebaseFirestore.getInstance();
 
-        userName = "user" + new Random().nextInt(10000);  // 랜덤한 유저 이름 설정 ex) user1234
+        firestore.collection("user").document(friendUid).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        userName=task.getResult().get("name").toString();
+                        chatTitle.setText(userName);
+                    }
+                });
+
+        ChatInfo chatModel = new ChatInfo();
+        chatModel.users.put(uid, true);
+        chatModel.users.put(friendUid, true);
+
+        if(chatRoomUid==null){
+            sendButton.setEnabled(false);
+            firebaseDatabase.getReference().child("chatrooms").push().setValue(chatModel)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            checkChatRoom();
+                        }
+                    });
+        }
+        else{
+            ChatInfo.Comment comment=new ChatInfo.Comment();
+            comment.uid=uid;
+            comment.message=editText.getText().toString();
+            comment.timestamp= ServerValue.TIMESTAMP;
+
+            firebaseDatabase.getReference().child("chatrooms").child(chatRoomUid).child("comments").push().setValue(comment)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            editText.setText("");
+                        }
+                    });
+        }
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
