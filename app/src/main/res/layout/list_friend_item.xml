@@ -8,8 +8,8 @@
     >
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/friend_profile"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/basicprofile"
@@ -36,15 +36,6 @@
             android:textColor="@color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            android:padding="5dp"
-            />
-        <TextView
-            android:id="@+id/friendintroduce"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="젤최근내용"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/friendname"
             android:padding="5dp"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>

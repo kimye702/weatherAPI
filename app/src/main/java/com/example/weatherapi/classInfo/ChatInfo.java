@@ -8,7 +8,8 @@ public class ChatInfo {
     public Map<String, Comment> comments=new HashMap<>();
 
     public static class Comment{
-        String uid;
-        String message;
+        public String uid;
+        public String message;
+        public Object timestamp;
     }
 }

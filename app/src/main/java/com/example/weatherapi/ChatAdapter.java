@@ -51,7 +51,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder>{
             //profile = (ImageView) itemView.findViewById(R.id.profile);
             name = (TextView) itemView.findViewById(R.id.txt_Title);
             message = (TextView) itemView.findViewById(R.id.txt_message);
-            date=(TextView) itemView.findViewById(R.id.txt_date);
+            //date=(TextView) itemView.findViewById(R.id.txt_date);
         }
 
         void onBind(ChatListInfo item){

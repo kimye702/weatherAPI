@@ -80,9 +80,10 @@ public class SignupActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(SignupActivity.this, "success.",
-                                            Toast.LENGTH_SHORT).show();
+//                                    Toast.makeText(SignupActivity.this, "success.",
+//                                            Toast.LENGTH_SHORT).show();
                                     // Sign in success, update UI with the signed-in user's information
+                                    Toast.makeText(SignupActivity.this, "정보 등록 중!\n완료 후 로그인 화면으로 이동합니다.", Toast.LENGTH_SHORT).show();
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     String uid=user.getUid();
                                     UserInfo userInfo=new UserInfo();
@@ -129,7 +130,6 @@ public class SignupActivity extends AppCompatActivity {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     String error = e.getMessage(); // 오류 메시지 가져오기
-                                    Toast.makeText(SignupActivity.this, "Authentication failed: " + error, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
