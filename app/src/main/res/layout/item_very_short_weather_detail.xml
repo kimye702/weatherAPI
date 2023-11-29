@@ -162,6 +162,26 @@
                 </TableRow>
 
                 <TableRow>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:text="강수량"
+                        android:textAlignment="viewStart"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvHourRain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </TableRow>
+
+                <TableRow>
 
                     <TextView
                         android:layout_width="wrap_content"

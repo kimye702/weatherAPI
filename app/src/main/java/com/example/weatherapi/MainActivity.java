@@ -42,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.home:{
                         startActivity(new Intent(MainActivity.this, WeatherLocationActivity.class));
                     }
-                    case R.id.chat:{
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.main_layout, chatFragment)
-                                .commit();
-                        return true;
-                    }
+//                    case R.id.chat_friend:{
+//                        getSupportFragmentManager().beginTransaction()
+//                                .replace(R.id.main_layout, chatFragment)
+//                                .commit();
+//                        return true;
+//                    }
                     case R.id.friend:{
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_layout, friendFragment)

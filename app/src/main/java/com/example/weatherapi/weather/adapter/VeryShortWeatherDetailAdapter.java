@@ -48,6 +48,7 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTime;
         private TextView tvRainType;
+        private TextView tvHourRain;
         private TextView tvPerceivedTemp;
         private TextView tvWind;
         private LottieAnimationView lt_very_short_detail;
@@ -60,6 +61,7 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
             super(itemView);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvRainType = itemView.findViewById(R.id.tvRainType);
+            tvHourRain = itemView.findViewById(R.id.tvHourRain);
             tvPerceivedTemp = itemView.findViewById(R.id.tvPerceivedTemp);
             tvWind = itemView.findViewById(R.id.tvWind);
             lt_very_short_detail = itemView.findViewById(R.id.lt_very_short_detail);
@@ -72,13 +74,14 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
         public void setItem(VeryShortWeatherModel item) {
             tvTime.setText(item.getFcstTime());
             tvRainType.setText(getRainType(item.getRainType()));
-            tvPerceivedTemp.setText(getPerceivedTemp(item.getTemp(), item.getWindSpeed()));
+            tvHourRain.setText(item.getHourRain());
+            tvPerceivedTemp.setText(getPerceivedTemp(item.getTemp(), item.getWindSpeed())+"°");
             tvWind.setText(item.getWindSpeed()+"m/s");
             lt_very_short_detail.setAnimation(getLottie(item.getFcstTime(),item.getSky(), item.getRainType()));
             tvHumidity.setText(item.getHumidity()+"%");
             tvSky.setText(getSky(item.getSky(), item.getRainType()));
             tvTemp.setText(item.getTemp() + "°");
-            tvRecommends.setText(getRecommends(Integer.parseInt(item.getTemp())));
+            tvRecommends.setText(getRecommends(Double.parseDouble(getPerceivedTemp(item.getTemp(),item.getWindSpeed()))));
         }
     }
 
@@ -92,7 +95,7 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
         // 체감온도를 소수점 첫째 자리까지 형식화
         String formattedResult = String.format("%.1f", result);
 
-        return formattedResult+"°";
+        return formattedResult;
     }
 
     public int getLottie(String time, String sky, String rain) {
@@ -270,7 +273,7 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
         return "알 수 없음";
     }
 
-    public String getRecommends(int temp) {
+    public String getRecommends(double temp) {
         if (temp >= 5 && temp <= 8) {
             return "울 코트, 가죽 옷, 기모";
         } else if (temp >= 9 && temp <= 11) {
