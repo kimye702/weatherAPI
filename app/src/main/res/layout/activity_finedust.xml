@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/refresh"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ProgressBar
+            android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/progressBar"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
 
         <TextView
+            android:id="@+id/errorDescriptionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/errorDescriptionTextView"
             android:layout_gravity="center"
             android:gravity="center"
-            android:visibility="gone"
-            android:text="예기치 못한 문제가 발생했습니다\n잠시 후 다시 시도해주세요"/>
+            android:text="예기치 못한 문제가 발생했습니다\n잠시 후 다시 시도해주세요"
+            android:visibility="gone" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/contentsLayout"
@@ -34,7 +32,7 @@
             android:alpha="0"
             android:padding="15dp"
             tools:background="@color/grey"
-            tools:context=".MainActivity">
+            tools:context=".finedust.FineDustActivity">
 
             <TextView
                 android:id="@+id/measuringStationNameTextView"
@@ -61,6 +59,15 @@
                 app:layout_constraintTop_toBottomOf="@id/measuringStationNameTextView"
                 tools:text="매우나쁨" />
 
+
+            <!--            <com.airbnb.lottie.LottieAnimationView-->
+            <!--                android:id="@+id/lv_finedust_total"-->
+            <!--                android:layout_width="80dp"-->
+            <!--                android:layout_height="80dp"-->
+            <!--                app:layout_constraintEnd_toEndOf="parent"-->
+            <!--                app:layout_constraintStart_toStartOf="parent"-->
+            <!--                app:layout_constraintTop_toBottomOf="@id/totalGraddeLabelTextView"/>-->
+
             <TextView
                 android:id="@+id/totalGradeEmojiTextView"
                 android:layout_width="wrap_content"
@@ -85,6 +92,7 @@
                 app:layout_constraintTop_toBottomOf="@id/totalGradeEmojiTextView"
                 tools:text="미세먼지: 40 😩" />
 
+<!--                app:layout_constraintTop_toBottomOf="@id/lv_finedust_total"-->
 
             <TextView
                 android:id="@+id/ultraFineDuistInformationTextView"

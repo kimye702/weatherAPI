@@ -7,7 +7,8 @@
     android:orientation="vertical"
     tools:background="@color/grey"
     android:id="@+id/item_hour_weather_simple"
-    android:gravity="center">
+    android:gravity="center"
+    android:padding="10dp">
 
 
     <TextView
@@ -21,8 +22,9 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lt_hour_weather"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginVertical="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,16 +38,28 @@
         android:id="@+id/tv_hour_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="@color/white"
-        android:text="10°" />
+        android:text="10°"
+        android:textSize="14sp"
+        android:textColor="@color/white" />
 
-    <TextView
-        android:id="@+id/tv_hour_rain"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        tools:text="46%"/>
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/water_drop"
+            android:layout_marginRight="2dp"/>
+
+        <TextView
+            android:id="@+id/tv_hour_rain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            tools:text="46%" />
+    </LinearLayout>
+
 </LinearLayout>

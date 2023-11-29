@@ -3,6 +3,7 @@ package com.example.weatherapi;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -11,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.weatherapi.weather.WeatherLocationActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -37,6 +39,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
+                    case R.id.home:{
+                        startActivity(new Intent(MainActivity.this, WeatherLocationActivity.class));
+                    }
+                    case R.id.chat:{
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_layout, chatFragment)
+                                .commit();
+                        return true;
+                    }
                     case R.id.friend:{
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_layout, friendFragment)

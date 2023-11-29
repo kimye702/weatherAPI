@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -51,6 +52,9 @@ public class VeryShortWeatherActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_very_short_weather);
+
+        ActionBar ac = getSupportActionBar();
+        ac.setTitle("초단기 예보 (6시간)");
 
         rv_very_short = findViewById(R.id.rv_very_short);
         rv_very_short.setLayoutManager(new LinearLayoutManager(this));
@@ -151,6 +155,7 @@ public class VeryShortWeatherActivity extends AppCompatActivity {
                         String fcstTime = items.get(i).fcstTime;
                         String formattedTime = fcstTime.substring(0, 2) + ":" + fcstTime.substring(2, 4);
                         weatherArr[i].setFcstTime(formattedTime);
+//                        weatherArr[i].setFcstDate(items.get(i).fcstDate);
                     }
 
                     String sky = weatherArr[0].getSky();
@@ -169,10 +174,6 @@ public class VeryShortWeatherActivity extends AppCompatActivity {
                             weather = "오류 rainType : " + sky;
                             break;
                     }
-
-//                    tv_weather.setText(weather);
-//                    tv_temprature.setText(weatherArr[0].getTemp());
-
 
                     rv_very_short.setAdapter(new VeryShortWeatherDetailAdapter(weatherArr));
 

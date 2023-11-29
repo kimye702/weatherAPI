@@ -1,6 +1,6 @@
 package com.example.weatherapi.weather.model;
 
-// 단기 예보 정보를 담는 데이터 클래스
+// 단기 예보 정보
 public class ShortWeatherModel {
     private String fcstTime; // 예보 시각
     private String rainPercent; // 강수확률
