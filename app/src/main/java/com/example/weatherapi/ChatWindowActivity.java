@@ -101,30 +101,30 @@ public class ChatWindowActivity extends AppCompatActivity {
         chatModel.users.put(uid, true);
         chatModel.users.put(friendUid, true);
 
-        if(chatRoomUid==null){
-            sendButton.setEnabled(false);
-            firebaseDatabase.getReference().child("chatrooms").push().setValue(chatModel)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            checkChatRoom();
-                        }
-                    });
-        }
-        else{
-            ChatInfo.Comment comment=new ChatInfo.Comment();
-            comment.uid=uid;
-            comment.message=editText.getText().toString();
-            comment.timestamp= ServerValue.TIMESTAMP;
-
-            firebaseDatabase.getReference().child("chatrooms").child(chatRoomUid).child("comments").push().setValue(comment)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            editText.setText("");
-                        }
-                    });
-        }
+//        if(chatRoomUid==null){
+//            sendButton.setEnabled(false);
+//            firebaseDatabase.getReference().child("chatrooms").push().setValue(chatModel)
+//                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                        @Override
+//                        public void onSuccess(Void unused) {
+//                            checkChatRoom();
+//                        }
+//                    });
+//        }
+//        else{
+//            ChatInfo.Comment comment=new ChatInfo.Comment();
+//            comment.uid=uid;
+//            comment.message=editText.getText().toString();
+//            comment.timestamp= ServerValue.TIMESTAMP;
+//
+//            firebaseDatabase.getReference().child("chatrooms").child(chatRoomUid).child("comments").push().setValue(comment)
+//                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<Void> task) {
+//                            editText.setText("");
+//                        }
+//                    });
+//        }
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
