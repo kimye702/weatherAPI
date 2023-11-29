@@ -4,15 +4,14 @@
 
     <!--날씨 API 가져오기-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!--위치정보-->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -21,17 +20,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WeatherAPI"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
         <!-- MainActivity를 시작 활동으로 설정 -->
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="@string/kakao_scheme"
-                    android:host="@string/kakaolink_host"/>
+
+                <data
+                    android:host="@string/kakaolink_host"
+                    android:scheme="@string/kakao_scheme" />
             </intent-filter>
         </activity>
 
@@ -50,40 +54,38 @@
         </activity>
         <activity
             android:name=".ChatWindowActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".SignupActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
-            android:name=".getLocationActivity"
-            android:exported="true">
-        </activity>
-        <activity android:name=".weather.test.LocationActivity"
-            android:exported="true">
-        </activity>
-        <activity android:name=".weather.WeatherLocationActivity"
-            android:theme="@style/Theme.Design.NoActionBar"
-            android:exported="true">
-        </activity>
-        <activity android:name=".finedust_test.KakaoApiTest"
-            android:exported="true">
-        </activity>
-        <activity android:name=".finedust.FineDustActivity"
-            android:exported="true">
-        </activity>
-                <activity android:name=".weather.VeryShortWeatherActivity"
-            android:exported="true">
-        </activity>
+            android:name=".weather.getLocationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Design.NoActionBar"></activity>
+        <activity
+            android:name=".weather.test.LocationActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".weather.WeatherLocationActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Design.NoActionBar"></activity>
+        <activity
+            android:name=".finedust_test.KakaoApiTest"
+            android:exported="true"></activity>
+        <activity
+            android:name=".finedust.FineDustActivity"
+            android:exported="true"></activity>
+        <activity
+            android:name=".weather.VeryShortWeatherActivity"
+            android:exported="true"></activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <!-- 필요에 의해 사용 -->
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <queries>
         <package android:name="com.kakao.talk" />
     </queries>

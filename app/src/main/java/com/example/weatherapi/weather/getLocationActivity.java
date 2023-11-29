@@ -2,40 +2,32 @@ package com.example.weatherapi.weather;
 
 import static java.lang.Math.pow;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
-import android.net.Uri;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.weatherapi.R;
-import com.example.weatherapi.finedust.FineDustActivity;
+import com.example.weatherapi.classInfo.UserInfo;
 import com.example.weatherapi.weather.adapter.DailyWeatherSimpleAdapter;
 import com.example.weatherapi.weather.adapter.HourWeatherSimpleAdapter;
 import com.example.weatherapi.weather.adapter.VeryShortWeatherDetailAdapter;
@@ -43,15 +35,12 @@ import com.example.weatherapi.weather.model.MedWeatherModel;
 import com.example.weatherapi.weather.model.ShortWeatherModel;
 import com.example.weatherapi.weather.model.VeryShortWeatherModel;
 import com.example.weatherapi.weather.util.Conversion;
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,15 +62,13 @@ import jxl.read.biff.BiffException;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public class WeatherLocationActivity extends AppCompatActivity {
-
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1981;
-    private static final int REQUEST_CODE_LOCATION_SETTINGS = 2981;
-    private static final String[] PERMISSIONS = new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION};
-    private FusedLocationProviderClient mFusedLocationClient;
-    private SettingsClient mSettingsClient;
-    private LocationRequest mLocationRequest;
-    private LocationSettingsRequest mLocationSettingsRequest;
+public class getLocationActivity extends AppCompatActivity {
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private DatabaseReference databaseReference;
+    private String userId;
+    private String friendUid;
+//    private TextView locationPosition;
 
     private TextView tv_date;
     private TextView tv_today_weather;
@@ -89,8 +76,7 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private TextView tv_perceived_temp;
     private TextView tv_highest_temp;
     private TextView tv_lowest_temp;
-    private Button btn_finedust;
-    private Button btn_very_short_weather;
+    //    private Button btn_finedust;
     private RecyclerView rv_very_short;
     private RecyclerView rv_hour_simple;
     private RecyclerView rv_daily_simple;
@@ -102,15 +88,13 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private String temp_region_code;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
+        setContentView(R.layout.activity_friends_weather);
+//        setContentView(R.layout.location_test);
 
-        init();
-        checkLocation();
-        requestLocation();
+//        locationPosition=findViewById(R.id.location_position);
 
         tv_date = findViewById(R.id.tv_date);
         tv_today_weather = findViewById(R.id.tv_today_weather);
@@ -119,14 +103,16 @@ public class WeatherLocationActivity extends AppCompatActivity {
         tv_highest_temp = findViewById(R.id.tv_highest_temp);
         tv_lowest_temp = findViewById(R.id.tv_lowest_temp);
         locationText = findViewById(R.id.tv_location);
-        btn_finedust = findViewById(R.id.btn_finedust);
-//        btn_very_short_weather = findViewById(R.id.btn_very_short_weather);
+//        btn_finedust = findViewById(R.id.btn_finedust);
         rv_very_short = findViewById(R.id.rv_very_short);
         rv_very_short.setLayoutManager(new LinearLayoutManager(this));
         rv_hour_simple = findViewById(R.id.rv_hour_simple);
         rv_hour_simple.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rv_daily_simple = findViewById(R.id.rv_daily_simple);
         rv_daily_simple.setLayoutManager(new LinearLayoutManager(this));
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         // 현재 시간을 가져옵니다.
         LocalDate currentDate = LocalDate.now();
@@ -150,34 +136,51 @@ public class WeatherLocationActivity extends AppCompatActivity {
 
         tv_date.setText(formattedDate);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-//        btn_very_short_weather.setOnClickListener(new View.OnClickListener() {
+        // 대기질은 현재 위치의 미세먼지 정보 반환하므로 친구 기능에서는 제외
+//        btn_finedust.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                Intent intent = new Intent(getApplicationContext(), VeryShortWeatherActivity.class);
-//                intent.putExtra("y", String.valueOf(curPoint.y));
-//                intent.putExtra("x", String.valueOf(curPoint.x));
+//                Intent intent = new Intent(getApplicationContext(), FineDustActivity.class);
 //                startActivity(intent);
 //            }
 //        });
 
-        btn_finedust.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), FineDustActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
 
-//     // 메뉴 리소스 XML의 내용을 앱바(App Bar)에 반영
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        return true;
-//    }
+        // Firebase 인증에서 현재 사용자의 UID를 가져옵니다.
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        friendUid = getIntent().getStringExtra("friendUid");
+        // Firebase Realtime Database 레퍼런스를 초기화합니다.
+        databaseReference = FirebaseDatabase.getInstance().getReference("user");
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                // 위치가 변경될 때마다 Firebase에 업데이트합니다.
+                updateLocationInFirebase(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
+        }
+
+        monitorFriendLocation();
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setWeather(String nx, String ny) {
@@ -311,8 +314,8 @@ public class WeatherLocationActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<WEATHER> call, @NonNull Response<WEATHER> response) {
                 if (response.isSuccessful()) {
                     WEATHER weather = response.body();
-                    System.out.println("response : " + response);
-                    if (weather != null) {
+//                    System.out.println("response : "+response);
+                    if (weather != null && weather.response != null && weather.response.body != null && weather.response.body.items != null) {
                         List<ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
 
                         int now_hour = Integer.parseInt(timeH);
@@ -415,8 +418,7 @@ public class WeatherLocationActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
 
                     }
-                } else
-                    Toast.makeText(getApplicationContext(), "단기 예보 로드 실패", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @SuppressLint("SetTextI18n")
@@ -696,33 +698,21 @@ public class WeatherLocationActivity extends AppCompatActivity {
 
     // 지역 코드 가져오기
     private String getTempRegionCode(String region) {
-//        System.out.println("현재 위치 : " + region);
 
         try {
             InputStream is = getBaseContext().getResources().getAssets().open("region_code.xls");
 
-            Workbook wb = Workbook.getWorkbook(is); //엑셀파일
-            //엑셀 파일이 있다면
-            Sheet sheet = wb.getSheet(0);//시트 블러오기
+            Workbook wb = Workbook.getWorkbook(is);
+            Sheet sheet = wb.getSheet(0);
 
             if (sheet != null) {
-//                int colTotal = sheet.getColumns(); //전체 컬럼
                 int rowTotal = sheet.getColumn(0).length;
 
                 for (int row = 0; row < rowTotal; row++) {
-
-                    //col: 컬럼순서, contents: 데이터값
-//                        for (int col = 0; col < colTotal; col++) {
-//                            String contents = sheet.getCell(col, row).getContents();
-//                            Log.d("region_code", col + "번째: " + contents);
-//                        }
-
                     String name = sheet.getCell(0, row).getContents();
                     String code = sheet.getCell(1, row).getContents();
 
-                    // 일치하는 지역 있으면
                     if (region.contains(name)) {
-//                            System.out.println("검색한 region_code : " + code);
                         return code;
                     }
                 }
@@ -736,74 +726,31 @@ public class WeatherLocationActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint({"MissingPermission", "SetTextI18n"})
-    private void requestLocation() {
-        FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+    private void requestLocation(String lat, String lon) {
+        double latitude = Double.parseDouble(lat);
+        double longitude = Double.parseDouble(lon);
 
-        fusedLocationProviderClient.getLastLocation()
-                .addOnSuccessListener(location -> {
-                    if (location != null) {
-                        curPoint = Conversion.dfs_xy_conv(location.getLatitude(), location.getLongitude());
-                        setWeather(String.valueOf(curPoint.x), String.valueOf(curPoint.y));
-                        List<Address> addressList = getAddress(location.getLatitude(), location.getLongitude());
+        curPoint = Conversion.dfs_xy_conv(latitude, longitude);
+        setWeather(String.valueOf(curPoint.x), String.valueOf(curPoint.y)); // 단기, 초단기 예보
 
-//                        // 경산
-//                        List<Address> addressList1 = getAddress(35.828032,128.739770);
-//
-//                        if (!addressList1.isEmpty()) {
-//                            Address address = addressList1.get(0);
-//                            System.out.println("현재 지역 : "+address.getAddressLine(0)); // 대한민국 경상북도 경산시 중방동 834-27
-//                            System.out.println("현재 지역 : "+address.getThoroughfare()); // 중방동
-//                            System.out.println("현재 지역 : "+address.getLocality()); // 경산시
-//                            System.out.println("현재 지역 : "+address.getSubThoroughfare()); //834-27
-//                            System.out.println("현재 지역 : "+address.getSubAdminArea()); // null
-//                            System.out.println("현재 지역 : "+address.getSubLocality()); // null
-//                            region_code = getRegionCode(address.getAdminArea());
-//                        } else {
-//                            locationText.setText(location.getLatitude() + ", " + location.getLongitude());
-//                        }
+        List<Address> addressList = getAddress(latitude, longitude);
 
-//                        // 강원도 인제
-//                        List<Address> addressList1 = getAddress(38.065028,128.279208);
-//
-//                        if (!addressList1.isEmpty()) {
-//                            Address address = addressList1.get(0);
-//                            System.out.println("현재 지역 : "+address.getAddressLine(0)); // 대한민국 경상북도 경산시 중방동 834-27
-//                            System.out.println("현재 지역 : "+address.getThoroughfare()); // 중방동
-//                            System.out.println("현재 지역 : "+address.getLocality()); // 경산시
-//                            System.out.println("현재 지역 : "+address.getSubThoroughfare()); //834-27
-//                            System.out.println("현재 지역 : "+address.getSubAdminArea()); // null
-//                            System.out.println("현재 지역 : "+address.getSubLocality()); // null
-//                            temp_region_code = getTempRegionCode(address.getAdminArea());
-//                        } else {
-//                            locationText.setText(location.getLatitude() + ", " + location.getLongitude());
-//                        }
-
-                        if (!addressList.isEmpty()) {
-                            Address address = addressList.get(0);
-                            locationText.setText(address.getThoroughfare());
-//                        region = address.getAdminArea();
-//                            System.out.println("현재 지역 : "+address.getAddressLine(0)); // 대한민국 대구광역시 북구 대현동 19-54
-//                            System.out.println("현재 지역 : "+address.getThoroughfare()); // 대현동
-//                            System.out.println("현재 지역 : "+address.getLocality()); // null
-//                            System.out.println("현재 지역 : "+address.getSubThoroughfare()); // 19-54
-//                            System.out.println("현재 지역 : "+address.getSubAdminArea()); // null
-//                            System.out.println("현재 지역 : "+address.getSubLocality()); // 북구
-                            weather_region_code = getWeatherRegionCode(address.getAdminArea(), location.getLongitude());
-                            temp_region_code = getTempRegionCode(address.getAdminArea());
-                            setMedWeather(String.valueOf(curPoint.x), String.valueOf(curPoint.y));
-                        } else {
-                            locationText.setText(location.getLatitude() + ", " + location.getLongitude());
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("requestLocation", "fail"));
+        if (!addressList.isEmpty()) {
+            Address address = addressList.get(0);
+            locationText.setText(address.getThoroughfare());
+            weather_region_code = getWeatherRegionCode(address.getAdminArea(), longitude);
+            temp_region_code = getTempRegionCode(address.getAdminArea());
+            setMedWeather(String.valueOf(curPoint.x), String.valueOf(curPoint.y)); // 중기 예보
+        } else {
+            locationText.setText(latitude + ", " + longitude);
+        }
     }
 
     private List<Address> getAddress(double lat, double lng) {
         List<Address> address = null;
 
         try {
-            Geocoder geocoder = new Geocoder(WeatherLocationActivity.this, Locale.KOREA);
+            Geocoder geocoder = new Geocoder(getLocationActivity.this, Locale.KOREA);
             address = geocoder.getFromLocation(lat, lng, 10);
         } catch (IOException e) {
             Toast.makeText(this, "주소를 가져 올 수 없습니다", Toast.LENGTH_SHORT).show();
@@ -833,7 +780,7 @@ public class WeatherLocationActivity extends AppCompatActivity {
         return result;
     }
 
-    private String getBaseTime2() {
+private String getBaseTime2() {
         int hour = Integer.parseInt(new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis())));
         int minute = Integer.parseInt(new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis())));
 
@@ -865,7 +812,6 @@ public class WeatherLocationActivity extends AppCompatActivity {
 //        return hour;
 //    }
 
-
     private String getBaseTime3() {
         String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis()));
         String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
@@ -882,125 +828,54 @@ public class WeatherLocationActivity extends AppCompatActivity {
         return hour;
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_LOCATION_SETTINGS) {
-            switch (resultCode) {
-                case Activity.RESULT_OK:
-                    Toast.makeText(WeatherLocationActivity.this, "Result OK", Toast.LENGTH_SHORT).show();
-                    break;
-                case Activity.RESULT_CANCELED:
-                    Toast.makeText(WeatherLocationActivity.this, "Result Cancel", Toast.LENGTH_SHORT).show();
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    private void init() {
-        if (mFusedLocationClient == null) {
-            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        }
-
-        mSettingsClient = LocationServices.getSettingsClient(this);
-
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(20 * 1000);
-        //mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-        builder.addLocationRequest(mLocationRequest);
-        mLocationSettingsRequest = builder.build();
-    }
-
-    private void checkLocation() {
-        if (isPermissionGranted()) {
-            startLocationUpdates();
-        } else {
-            requestPermissions();
-        }
-    }
-
-    private boolean isPermissionGranted() {
-        for (String permission : PERMISSIONS) {
-            if (permission.equals(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION) && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                continue;
-            }
-            final int result = ContextCompat.checkSelfPermission(this, permission);
-
-            if (PackageManager.PERMISSION_GRANTED != result) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void requestPermissions() {
-        requestPermissions(PERMISSIONS, REQUEST_PERMISSIONS_REQUEST_CODE);
-    }
-
-    private void startLocationUpdates() {
-        mSettingsClient.checkLocationSettings(mLocationSettingsRequest).addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
-            @SuppressLint("MissingPermission")
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-            }
-        }).addOnFailureListener(this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                if (e instanceof ResolvableApiException) {
-                    resolveLocationSettings(e);
-                } else {
-                }
-            }
-        });
-    }
-
-    public void resolveLocationSettings(Exception exception) {
-        ResolvableApiException resolvable = (ResolvableApiException) exception;
-        try {
-            resolvable.startResolutionForResult(this, REQUEST_CODE_LOCATION_SETTINGS);
-        } catch (IntentSender.SendIntentException e1) {
-            e1.printStackTrace();
-        }
+    private void updateLocationInFirebase(Location location) {
+        // UserInfo 객체에 위치 정보를 설정합니다.
+        UserInfo userInfo = new UserInfo();
+        userInfo.setLatitude(String.valueOf(location.getLatitude()));
+        userInfo.setLongtitude(String.valueOf(location.getLongitude()));
+        // Firebase에 위치 정보를 업데이트합니다.
+        databaseReference.child(userId).setValue(userInfo);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.length <= 0) {
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startLocationUpdates();
-            } else {
-                for (String permission : permissions) {
-                    if ("android.permission.ACCESS_FINE_LOCATION".equals(permission)) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setTitle("알림");
-                        builder.setMessage("위치 정보 권한이 필요합니다.\n\n[설정]->[권한]에서 '위치' 항목을 사용으로 설정해 주세요.");
-                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent();
-                                intent.setAction(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                intent.setData(Uri.fromParts("package", getPackageName(), null));
-                                startActivity(intent);
-                            }
-                        });
-                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                Toast.makeText(WeatherLocationActivity.this, "Cancel Click", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        AlertDialog alertDialog = builder.create();
-                        alertDialog.show();
+        if (requestCode == 101 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, locationListener);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+        }
+    }
+
+    private void monitorFriendLocation() {
+        DatabaseReference friendLocationRef = databaseReference.child(friendUid);
+        friendLocationRef.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    UserInfo friendInfo = dataSnapshot.getValue(UserInfo.class);
+                    if (friendInfo != null) {
+                        String locationText = "Latitude: " + friendInfo.getLatitude() +
+                                ", Longitude: " + friendInfo.getLongtitude();
+                        requestLocation(friendInfo.getLatitude(), friendInfo.getLongtitude());
+//                        locationPosition.setText(locationText);
                     }
                 }
             }
-        }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w("DBError", "Failed to read value.", databaseError.toException());
+            }
+        });
     }
 }
