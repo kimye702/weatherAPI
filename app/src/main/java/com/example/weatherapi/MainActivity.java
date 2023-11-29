@@ -3,55 +3,82 @@ package com.example.weatherapi;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.view.MenuItem;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
+
+import java.security.MessageDigest;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth=FirebaseAuth.getInstance();
-    private EditText signup_email;
-    private EditText signup_password;
-    private Button signup_button;
+    BottomNavigationView bottomNavigationView;
+    ChatFragment chatFragment;
+    FriendFragment friendFragment;
+    ProfileFragment profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main);
 
-        mAuth = FirebaseAuth.getInstance();
+        bottomNavigationView=findViewById(R.id.bottomnavi);
+        chatFragment=new ChatFragment();
+        friendFragment=new FriendFragment();
+        profileFragment=new ProfileFragment();
 
-        signup_email=findViewById(R.id.signup_email);
-        signup_password=findViewById(R.id.signup_password);
-        signup_button=findViewById(R.id.signup_button);
+        getAppKeyHash();
 
-        signup_button.setOnClickListener(new View.OnClickListener() {
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
-            public void onClick(View view) {
-                mAuth.createUserWithEmailAndPassword(signup_email.getText().toString(), signup_password.getText().toString())
-                        .addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                } else {
-                                    // If sign in fails, display a message to the user.
-                                    Toast.makeText(MainActivity.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.chat:{
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_layout, chatFragment)
+                                .commit();
+                        return true;
+                    }
+                    case R.id.friend:{
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_layout, friendFragment)
+                                .commit();
+                        return true;
+                    }
+
+                    case R.id.setting:{
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.main_layout, profileFragment)
+                                .commit();
+                        return true;
+                    }
+                }
+
+                return false;
             }
         });
     }
+
+    private void getAppKeyHash() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md;
+                md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                String something = new String(Base64.encode(md.digest(), 0));
+                Log.e("Hash key", something);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            Log.e("name not found", e.toString());
+        }
+    }
+
 }
