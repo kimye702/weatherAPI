@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,6 +55,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class FriendFragment extends Fragment {
 
@@ -61,12 +63,14 @@ public class FriendFragment extends Fragment {
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
-    FloatingActionButton floatingActionButton;
     EditText editText;
     Activity activity;
     UserInfo userInfo = new UserInfo();
-    Button addButton;
-    Button locationButton;
+    ImageView addButton;
+    ImageView plusFriend;
+    ConstraintLayout constraintCode;
+    ConstraintLayout constraintKakao;
+
 
     @Nullable
     @Override
@@ -78,21 +82,25 @@ public class FriendFragment extends Fragment {
         FriendAdapter friendAdapter = new FriendAdapter();
         recyclerView.setAdapter(friendAdapter);
 
-        floatingActionButton = view.findViewById(R.id.floatingfriend);
-        editText = view.findViewById(R.id.add_name);
+        plusFriend=view.findViewById(R.id.plus_friend);
 
-        addButton=view.findViewById(R.id.add_button);
-        locationButton=view.findViewById(R.id.location_button);
+        View bottomview = inflater.inflate(R.layout.add_bottom_sheet, null, false);
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        bottomSheetDialog.setContentView(bottomview);
 
-        String uid = firebaseAuth.getCurrentUser().getUid();
+        constraintCode=bottomview.findViewById(R.id.constraint_code);
+        constraintKakao=bottomview.findViewById(R.id.constraint_kakao);
+        editText = bottomview.findViewById(R.id.edit_code);
+        addButton=bottomview.findViewById(R.id.send_code);
 
-        locationButton.setOnClickListener(new View.OnClickListener() {
+        plusFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), getLocationActivity.class);
-                startActivity(intent);
+                bottomSheetDialog.show();
             }
         });
+
+        String uid = firebaseAuth.getCurrentUser().getUid();
 
         DocumentReference docRef = firestore.collection("user").document(uid);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -116,7 +124,7 @@ public class FriendFragment extends Fragment {
 
         KakaoSdk.init(getActivity(), getString(R.string.kakao_app_key));
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        constraintKakao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 KakaoLink(getContext());
@@ -127,7 +135,6 @@ public class FriendFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String friendUid = editText.getText().toString();
-
                 firestore.collection("user").document(userInfo.getUid()).get()
                         .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                             @Override
@@ -135,66 +142,67 @@ public class FriendFragment extends Fragment {
                                 if (task.isSuccessful()) {
                                     DocumentSnapshot document = task.getResult();
                                     if (document.exists()) {
-                                        // friendList 필드가 존재하는 경우
                                         List<String> friendList = (List<String>) document.get("friendList");
-
-                                        if (friendList!=null&&!friendList.contains(friendUid)) {
-                                            friendList.add(friendUid);
-
-                                            document.getReference().update("friendList", friendList)
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                // 업데이트 성공
-                                                                Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
-                                                            } else {
-                                                                // 업데이트 실패
-                                                                Toast.makeText(getActivity(), "친구 등록에 실패했어요!", Toast.LENGTH_LONG).show();
-                                                            }
-                                                        }
-                                                    });
-                                        }
-
-                                        if(friendList==null){
+                                        if (friendList == null) {
                                             friendList = new ArrayList<>();
+                                        }
+                                        else if (!friendList.contains(friendUid)) {
                                             friendList.add(friendUid);
-
                                             document.getReference().update("friendList", friendList)
-                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                         @Override
-                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                            if (task.isSuccessful()) {
-                                                                // 업데이트 성공
-                                                                Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
-                                                            } else {
-                                                                // 업데이트 실패
-                                                                Toast.makeText(getActivity(), "친구 등록에 실패했어요!", Toast.LENGTH_LONG).show();
-                                                            }
+                                                        public void onSuccess(Void aVoid) {
+                                                            friendAdapter.loadUserModels(); // 업데이트 호출
+                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
                                                         }
                                                     });
-                                        }
-
-                                        if(friendList.contains(friendUid)){
+                                        } else {
                                             Toast.makeText(getActivity(), "이미 추가된 친구입니다.", Toast.LENGTH_LONG).show();
                                         }
                                     } else {
-                                        // 문서가 존재하지 않음
                                         Toast.makeText(getActivity(), "존재하지 않는 친구코드에요!", Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-                                    // 문서 가져오기 실패
-                                    Exception e = task.getException();
-                                    if (e != null) {
-                                        // 예외 처리
-                                        Toast.makeText(getActivity(), "오류 발생: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                    }
+                                    Toast.makeText(getActivity(), "오류 발생: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
 
+                firestore.collection("user").document(friendUid).get()
+                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        List<String> friendList = (List<String>) document.get("friendList");
+                                        if (friendList == null) {
+                                            friendList = new ArrayList<>();
+                                        }
+                                        else if (!friendList.contains(userInfo.getUid())) {
+                                            friendList.add(userInfo.getUid());
+                                            document.getReference().update("friendList", friendList)
+                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            friendAdapter.loadUserModels(); // 업데이트 호출
+                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    });
+                                        } else {
+                                            Toast.makeText(getActivity(), "이미 추가된 친구입니다.", Toast.LENGTH_LONG).show();
+                                        }
+                                    } else {
+                                        Toast.makeText(getActivity(), "존재하지 않는 친구코드에요!", Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getActivity(), "오류 발생: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
             }
         });
+
 
         return view;
     }
@@ -255,9 +263,20 @@ public class FriendFragment extends Fragment {
 
             CircleImageView imageView;
             TextView textView;
+            ConstraintLayout friendWeather;
+            ConstraintLayout friendChat;
 
             imageView = view.findViewById(R.id.friend_profile);
             textView = view.findViewById(R.id.friendname);
+
+            LayoutInflater layoutInflater = LayoutInflater.from(holder.itemView.getContext());
+            View friendSheetView = layoutInflater.inflate(R.layout.friend_bottom_sheet, null, false);
+            BottomSheetDialog friendSheetDialog = new BottomSheetDialog(holder.itemView.getContext());
+            friendSheetDialog.setContentView(friendSheetView);
+
+            friendWeather = friendSheetView.findViewById(R.id.weather_friend);
+            friendChat = friendSheetView.findViewById(R.id.chat_friend);
+
 
             storageRef.child("profileImage/"+userInfo.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
@@ -275,10 +294,54 @@ public class FriendFragment extends Fragment {
                 textView.setText(userInfo.getName());
             }
 
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent=new Intent(getContext(), getLocationActivity.class);
+                    View friendSheetView = LayoutInflater.from(getContext()).inflate(R.layout.friend_bottom_sheet, null, false);
+                    BottomSheetDialog friendSheetDialog = new BottomSheetDialog(getContext());
+                    friendSheetDialog.setContentView(friendSheetView);
+
+                    ConstraintLayout friendWeather = friendSheetView.findViewById(R.id.weather_friend);
+                    ConstraintLayout friendChat = friendSheetView.findViewById(R.id.chat_friend);
+
+                    friendWeather.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d(TAG, "Weather clicked for position: " + position);
+                            Intent intent = new Intent(getContext(), getLocationActivity.class);
+                            intent.putExtra("friendUid", userModels.get(holder.getAdapterPosition()).getUid());
+                            startActivity(intent);
+                        }
+                    });
+
+                    friendChat.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d(TAG, "Chat clicked for position: " + position);
+                            Intent intent = new Intent(getContext(), ChatWindowActivity.class);
+                            intent.putExtra("friendUid", userModels.get(holder.getAdapterPosition()).getUid());
+                            startActivity(intent);
+                        }
+                    });
+
+                    friendSheetDialog.show();
+                }
+            });
+
+            friendWeather.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getContext(), getLocationActivity.class);
+                    intent.putExtra("friendUid", userModels.get(position).getUid());
+                    startActivity(intent);
+                }
+            });
+
+            friendChat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getContext(), ChatWindowActivity.class);
                     intent.putExtra("friendUid", userModels.get(position).getUid());
                     startActivity(intent);
                 }
@@ -309,6 +372,7 @@ public class FriendFragment extends Fragment {
                                 if (document.exists()) {
                                     List<String> friendList = (List<String>) document.get("friendList");
                                     if (friendList != null) {
+                                        userModels.clear(); // 기존 목록 초기화
                                         for (String friendUid : friendList) {
                                             firestore.collection("user").document(friendUid).get()
                                                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -319,7 +383,7 @@ public class FriendFragment extends Fragment {
                                                                 if (userDocument.exists()) {
                                                                     UserInfo userInfo = userDocument.toObject(UserInfo.class);
                                                                     userModels.add(userInfo);
-                                                                    notifyDataSetChanged(); // 여기로 이동
+                                                                    notifyDataSetChanged(); // 새로운 데이터로 목록 업데이트
                                                                 }
                                                             } else {
                                                                 // 예외 처리
@@ -335,6 +399,7 @@ public class FriendFragment extends Fragment {
                         }
                     });
         }
+
     }
 
 }

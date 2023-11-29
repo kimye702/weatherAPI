@@ -4,53 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:gravity="center"
-    >
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logo_border" />
+
+    <EditText
+        android:id="@+id/signin_email"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        >
-        <EditText
-            android:id="@+id/signin_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="e-mail"
-            android:inputType="textEmailAddress"/>
-        <EditText
-            android:id="@+id/signin_password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="비밀번호"
-            android:inputType="textPassword"
-            />
-        <CheckBox
-            android:id="@+id/login_checkbox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="자동로그인"/>
-        <Button
-            android:id="@+id/signin_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="로그인"
-            />
-        <Button
-            android:id="@+id/signin_signupbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="회원가입"
-            />
+        android:ems="10"
+        android:hint="e-mail"
+        android:padding="10dp"
+        android:inputType="textEmailAddress"
+        android:background="@drawable/edittext_style"
+        android:layout_marginBottom="10dp"/>
 
-    </LinearLayout>
+    <EditText
+        android:id="@+id/signin_password"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="비밀번호"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:background="@drawable/edittext_style"
+        android:layout_marginBottom="10dp"/>
 
+    <CheckBox
+        android:id="@+id/login_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="자동로그인"
+        android:layout_marginBottom="20dp"/>
 
+    <Button
+        android:id="@+id/signin_button"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="로그인"
+        android:background="@drawable/button_style"
+        android:layout_marginBottom="10dp"/>
 
+    <Button
+        android:id="@+id/signin_signupbutton"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:text="회원가입"
+        android:background="@drawable/button_style"
+        android:layout_marginBottom="10dp"/>
 </LinearLayout>
