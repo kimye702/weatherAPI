@@ -13,11 +13,6 @@
         android:title="친구"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/chat"
-        android:icon="@drawable/chat"
-        android:title="채팅"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/setting"
         android:icon="@drawable/setting"
         android:title="설정"
