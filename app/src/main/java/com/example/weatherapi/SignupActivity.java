@@ -36,7 +36,6 @@ public class SignupActivity extends AppCompatActivity {
     private EditText signup_password;
     private EditText signup_name;
     private Button signup_button;
-    private Button check_button;
     private ImageView signup_profile;
     private Uri imageUri;
     private String profile;
@@ -53,8 +52,6 @@ public class SignupActivity extends AppCompatActivity {
         signup_email=findViewById(R.id.signup_email);
         signup_password=findViewById(R.id.signup_password);
         signup_button=findViewById(R.id.signup_button);
-        check_button=findViewById(R.id.check_button);
-        check_button=findViewById(R.id.check_button);
         signup_profile=findViewById(R.id.signup_profile);
         signup_name=findViewById(R.id.signup_name);
 

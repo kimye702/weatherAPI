@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,11 +15,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.weatherapi.classInfo.UserInfo;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -27,11 +34,13 @@ public class SigninActivity extends AppCompatActivity {
     private FirebaseAuth mAuth=FirebaseAuth.getInstance();
     private FirebaseStorage firebaseStorage=FirebaseStorage.getInstance();
     private FirebaseFirestore firestore=FirebaseFirestore.getInstance();
+    private FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
     private EditText signin_email;
     private EditText signin_password;
     private Button signin_button;
     private Button signin_signupbutton;
     private CheckBox login_checkbox;
+
     String auto_check;
 
     @Override
@@ -52,6 +61,7 @@ public class SigninActivity extends AppCompatActivity {
             if (mAuth.getCurrentUser() != null && auto_check.equals("true")) {
                 // User is signed in (getCurrentUser() will be null if not signed in)
                 Intent intent = new Intent(SigninActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
                 // or do some other stuff that you want to do
@@ -72,8 +82,29 @@ public class SigninActivity extends AppCompatActivity {
                                     // Sign in success, update UI with the signed-in user's information
                                     FirebaseUser user = mAuth.getCurrentUser();
 
-                                    Intent intent=new Intent(SigninActivity.this, MainActivity.class);
-                                    startActivity(intent);
+                                    DatabaseReference friendLocationRef = firebaseDatabase.getReference("user").child(user.getUid());
+                                    friendLocationRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (!dataSnapshot.exists()) {
+                                                Intent intent = new Intent(SigninActivity.this, SetLocationActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            } else {
+                                                Intent intent = new Intent(SigninActivity.this, MainActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            Log.w("DBError", "Failed to read value.", databaseError.toException());
+                                        }
+                                    });
+
+
+
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Toast.makeText(SigninActivity.this, "Authentication failed.",
