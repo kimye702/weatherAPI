@@ -41,7 +41,7 @@ public interface WeatherInterface {
                             @Query("tmFc") String base_time); // 발표 시각
 
     // 중기 예보 - 육상 예보
-    @GET("MidFcstInfoService/getMidTa?serviceKey="+ BuildConfig.AIR_KOREA_SERVICE_KEY)
+    @GET("MidFcstInfoService/getMidLandFcst?serviceKey="+ BuildConfig.AIR_KOREA_SERVICE_KEY)
     Call<med_WEATHER> GetMediumTermWeather(@Query("numOfRows") int num_of_rows,
                             @Query("pageNo") int page_no,
                             @Query("dataType") String data_type,

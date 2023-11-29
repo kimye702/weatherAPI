@@ -57,7 +57,6 @@ public class HourWeatherSimpleAdapter extends RecyclerView.Adapter<HourWeatherSi
         @SuppressLint("SetTextI18n")
         public void setItem(ShortWeatherModel item) {
             tv_hour.setText(item.getFcstTime());
-//            iv_hour_weather.setImageResource(getSky(item.getSky()));
             lt_hour_weather.setAnimation(getLottie(item.getFcstTime(), item.getSky(), item.getRainType()));
             tv_hour_temp.setText(item.getHourTemp() + "°C");
             tv_hour_rain.setText(item.getRainPercent() + "%");

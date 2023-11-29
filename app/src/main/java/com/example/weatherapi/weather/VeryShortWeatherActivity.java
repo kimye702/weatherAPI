@@ -3,12 +3,14 @@ package com.example.weatherapi.weather;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +45,7 @@ public class VeryShortWeatherActivity extends AppCompatActivity {
     private TextView locationText;
     private Point curPoint;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,16 +81,25 @@ public class VeryShortWeatherActivity extends AppCompatActivity {
         setWeather(intent.getStringExtra("x"),intent.getStringExtra("y"));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setWeather(String nx, String ny) {
-        Calendar cal = Calendar.getInstance();
-        String base_date = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
-        String timeH = new SimpleDateFormat("HH", Locale.getDefault()).format(cal.getTime());
-        String timeM = new SimpleDateFormat("HH", Locale.getDefault()).format(cal.getTime());
+        // 현재 날짜와 시간
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDate currentDate = currentDateTime.toLocalDate();
+
+        // 날짜 형식 지정
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyyMMdd", Locale.getDefault());
+        String base_date = currentDate.format(dateFormatter);
+
+        // 시간 형식 지정
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH", Locale.getDefault());
+        String timeH = currentDateTime.format(timeFormatter);
+        String timeM = currentDateTime.format(timeFormatter);
         String base_time = getBaseTime(timeH, timeM);
 
-        if (timeH.equals("00") && base_time.equals("2330")) {
-            cal.add(Calendar.DATE, -1);
-            base_date = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(cal.getTime());
+        if ("00".equals(timeH) && "2330".equals(base_time)) {
+            currentDate = currentDate.minusDays(1);
+            base_date = currentDate.format(dateFormatter);
         }
 
         Call<WEATHER> very_short_call = ApiObject.retrofitService.GetVeryShortTermWeather(60, 1, "JSON", base_date, base_time, nx, ny);

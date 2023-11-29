@@ -138,15 +138,14 @@
                 android:id="@+id/btn_very_short_weather"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="20dp"
+                android:layout_marginVertical="10dp"
                 android:background="@drawable/shape_widget_background"
                 android:text="초단기 예보" />
 
             <LinearLayout
                 android:id="@+id/ly_rv_hour_simple"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="120dp"
                 android:orientation="horizontal">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -155,17 +154,17 @@
                     android:layout_height="match_parent" />
             </LinearLayout>
 
-<!--            <LinearLayout-->
-<!--                android:id="@+id/ly_rv_daily_simple"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="100dp"-->
-<!--                android:orientation="vertical">-->
+            <LinearLayout
+                android:id="@+id/ly_rv_daily_simple"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-<!--                <androidx.recyclerview.widget.RecyclerView-->
-<!--                    android:id="@+id/rv_daily_simple"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent" />-->
-<!--            </LinearLayout>-->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_daily_simple"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.weatherapi.R;
 import com.example.weatherapi.weather.model.VeryShortWeatherModel;
 
-// 단기 예보 디테일 어댑터 - 레이아웃 바꾸고 연결부분 수정해야됨
+// 단기예보 디테일 어댑터 - 레이아웃 바꾸고 연결부분 수정해야됨
 public class HourWeatherDetailAdapter extends RecyclerView.Adapter<HourWeatherDetailAdapter.ViewHolder> {
     private VeryShortWeatherModel[] items;
 
