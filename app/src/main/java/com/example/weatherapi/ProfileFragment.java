@@ -1,30 +1,48 @@
 package com.example.weatherapi;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.zip.Inflater;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProfileFragment extends Fragment {
     private Button logoutButton;
     private FirebaseAuth mFirebaseAuth; //파이어베이스 인증
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     StorageReference storageRef = storage.getReference();
+    private CircleImageView myImage;
+    private TextView myName;
 
     @Nullable
     @Override
@@ -32,6 +50,38 @@ public class ProfileFragment extends Fragment {
         View view = inflater.inflate(R.layout.profile, container, false);
 
         logoutButton=view.findViewById(R.id.logout_button);
+        myImage=view.findViewById(R.id.my_image);
+        myName=view.findViewById(R.id.my_name);
+
+        storageRef.child("profileImage/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Glide.with(getContext()).load(uri).circleCrop().into(myImage);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                myImage.setImageResource(R.drawable.friend);
+            }
+        });
+
+        DocumentReference docRef = firestore.collection("user").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        myName.setText(document.getData().get("name").toString());
+                        //Toast.makeText(getActivity(),userInfo.getName(), Toast.LENGTH_LONG).show();
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
 
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
