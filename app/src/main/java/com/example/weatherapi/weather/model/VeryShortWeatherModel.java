@@ -1,7 +1,8 @@
 package com.example.weatherapi.weather.model;
 
-// 초단기 예보 정보를 담는 데이터 클래스
+// 초단기 예보 정보
 public class VeryShortWeatherModel {
+    private String fcstDate;
     private String fcstTime; // 예보 시각
     private String temp;     // 기온
     private String hourRain; // 1시간 강수량
@@ -9,6 +10,14 @@ public class VeryShortWeatherModel {
     private String humidity; // 습도
     private String rainType; // 강수 형태
     private String windSpeed; // 풍속
+
+    public String getFcstDate() {
+        return fcstDate;
+    }
+
+    public void setFcstDate(String fcstDate) {
+        this.fcstDate = fcstDate;
+    }
 
     public String getHourRain() {
         return hourRain;
