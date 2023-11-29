@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">WeatherAPI</string>
+    <string name="navigation_drawer_open">네비게이션 열림</string>
+    <string name="navigation_drawer_close">네비게이션 닫힘</string>
 </resources>

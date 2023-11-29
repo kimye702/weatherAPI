@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Geocoder;
@@ -16,8 +17,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,9 +31,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,6 +58,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,7 +97,6 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private TextView tv_highest_temp;
     private TextView tv_lowest_temp;
     private Button btn_finedust;
-    private Button btn_very_short_weather;
     private RecyclerView rv_very_short;
     private RecyclerView rv_hour_simple;
     private RecyclerView rv_daily_simple;
@@ -101,12 +107,64 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private String weather_region_code;
     private String temp_region_code;
 
+    // 네비게이션 드로어
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
+    private ImageView nav_icon;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+
+        // 툴바와 드로어를 연동
+        actionBarDrawerToggle = new ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        );
+        drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        actionBarDrawerToggle.syncState();
+
+        // 툴바에 네비게이션 버튼 표시
+//        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        // 네비게이션 메뉴 아이템 클릭 리스너 설정
+        navigationView.setNavigationItemSelectedListener(item -> {
+            // 클릭된 아이템에 대한 동작 처리
+            switch (item.getItemId()) {
+                case R.id.nav_item1:
+                    // 네비게이션 메뉴 1 선택 시 동작
+                    break;
+                case R.id.nav_item2:
+                    // 네비게이션 메뉴 2 선택 시 동작
+                    break;
+                case R.id.nav_item3:
+                    break;
+                // 다른 메뉴 아이템들에 대한 처리 추가
+            }
+
+            // 네비게이션 드로어를 닫음
+            drawerLayout.closeDrawer(GravityCompat.START);
+
+            return true;
+        });
+
+        nav_icon = findViewById(R.id.nav_icon);
+
+        nav_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openNavigationDrawer();
+            }
+        });
+
 
         init();
         checkLocation();
@@ -120,7 +178,6 @@ public class WeatherLocationActivity extends AppCompatActivity {
         tv_lowest_temp = findViewById(R.id.tv_lowest_temp);
         locationText = findViewById(R.id.tv_location);
         btn_finedust = findViewById(R.id.btn_finedust);
-//        btn_very_short_weather = findViewById(R.id.btn_very_short_weather);
         rv_very_short = findViewById(R.id.rv_very_short);
         rv_very_short.setLayoutManager(new LinearLayoutManager(this));
         rv_hour_simple = findViewById(R.id.rv_hour_simple);
@@ -139,29 +196,10 @@ public class WeatherLocationActivity extends AppCompatActivity {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM월 dd일 EEEE");
         String formattedDate = currentDate.format(formatter);
 
-        // 시간을 오전 또는 오후로 변환합니다.
-        String amPm;
-        if (hour >= 12) {
-            amPm = "오후";
-            hour -= 12;
-        } else {
-            amPm = "오전";
-        }
-
         tv_date.setText(formattedDate);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-//        btn_very_short_weather.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getApplicationContext(), VeryShortWeatherActivity.class);
-//                intent.putExtra("y", String.valueOf(curPoint.y));
-//                intent.putExtra("x", String.valueOf(curPoint.x));
-//                startActivity(intent);
-//            }
-//        });
 
         btn_finedust.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,12 +210,33 @@ public class WeatherLocationActivity extends AppCompatActivity {
         });
     }
 
-//     // 메뉴 리소스 XML의 내용을 앱바(App Bar)에 반영
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        return true;
-//    }
+    private void openNavigationDrawer() {
+        // DrawerLayout을 열도록 하는 코드 추가
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // ActionBarDrawerToggle의 상태를 동기화
+        actionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 화면 방향 전환 등의 변경 시 ActionBarDrawerToggle에 알려줌
+        actionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    // ActionBar의 Home 버튼 클릭 이벤트를 처리
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setWeather(String nx, String ny) {
@@ -280,19 +339,21 @@ public class WeatherLocationActivity extends AppCompatActivity {
                             break;
                     }
 
-                    tv_today_weather.setText(weather);
-                    tv_now_temp.setText(weatherArr[0].getTemp());
+                    // 초단기 예보 정보를 받은 후에 UI 업데이트
+                    runOnUiThread(() -> {
+                        tv_today_weather.setText(weather);
+                        tv_now_temp.setText(weatherArr[0].getTemp());
 
-                    double T = Double.parseDouble(weatherArr[0].getTemp());
-                    double V = Double.parseDouble(weatherArr[0].getWindSpeed());
-                    double rst = 13.12 + 0.6251 * T - 11.37 * pow(V, 0.16) + 0.3965 * pow(V, 0.16) * T;
+                        double T = Double.parseDouble(weatherArr[0].getTemp());
+                        double V = Double.parseDouble(weatherArr[0].getWindSpeed());
+                        double rst = 13.12 + 0.6251 * T - 11.37 * pow(V, 0.16) + 0.3965 * pow(V, 0.16) * T;
 
-                    // 체감온도를 소수점 첫째 자리까지 형식화
-                    String perceived_temp = String.format("%.1f", rst);
-                    tv_perceived_temp.setText(perceived_temp + "°");
+                        // 체감온도를 소수점 첫째 자리까지 형식화
+                        String perceived_temp = String.format("%.1f", rst);
+                        tv_perceived_temp.setText(perceived_temp + "°");
 
-
-                    rv_very_short.setAdapter(new VeryShortWeatherDetailAdapter(weatherArr));
+                        rv_very_short.setAdapter(new VeryShortWeatherDetailAdapter(weatherArr));
+                    });
 
                     Toast.makeText(getApplicationContext(), "초단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
                 }
@@ -311,8 +372,8 @@ public class WeatherLocationActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<WEATHER> call, @NonNull Response<WEATHER> response) {
                 if (response.isSuccessful()) {
                     WEATHER weather = response.body();
-                    System.out.println("response : " + response);
-                    if (weather != null) {
+//                    System.out.println("response : " + response);
+                    if (weather != null && weather.response != null && weather.response.body != null && weather.response.body.items != null) {
                         List<ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
 
                         int now_hour = Integer.parseInt(timeH);
@@ -328,7 +389,7 @@ public class WeatherLocationActivity extends AppCompatActivity {
                         int index = 0;
                         int totalCount = response.body().response.body.totalCount - 1;
 
-                        int num = totalCount / 12 - diff;
+                        int num = totalCount / 12;
 
                         ShortWeatherModel[] weatherArr = new ShortWeatherModel[num];
 
@@ -337,7 +398,7 @@ public class WeatherLocationActivity extends AppCompatActivity {
                         }
 
 //                    System.out.println("단기예보 totalCount : " + totalCount);
-                        for (int i = diff; i <= totalCount; i++) {
+                        for (int i = 0; i <= totalCount; i++) {
                             switch (items.get(i).category) {
                                 case "POP": // 강수확률
                                     weatherArr[index].setRainPercent(items.get(i).fcstValue);
@@ -400,23 +461,26 @@ public class WeatherLocationActivity extends AppCompatActivity {
                             }
                         }
 
-                        if (low_temp != null)
-                            tv_lowest_temp.setText(low_temp + "°");
-                        else
-                            tv_lowest_temp.setText("error");
+                        String finalLow_temp = low_temp;
+                        String finalHigh_temp = high_temp;
+                        runOnUiThread(() -> {
+                            if (finalLow_temp != null)
+                                tv_lowest_temp.setText(finalLow_temp + "°");
+                            else
+                                tv_lowest_temp.setText("error");
 
-                        if (high_temp != null)
-                            tv_highest_temp.setText(high_temp + "°");
-                        else
-                            tv_highest_temp.setText("error");
+                            if (finalHigh_temp != null)
+                                tv_highest_temp.setText(finalHigh_temp + "°");
+                            else
+                                tv_highest_temp.setText("error");
 
-                        rv_hour_simple.setAdapter(new HourWeatherSimpleAdapter(weatherArr));
+                            rv_hour_simple.setAdapter(new HourWeatherSimpleAdapter(weatherArr));
+
+                        });
 
                         Toast.makeText(getApplicationContext(), "단기 예보 로드 성공", Toast.LENGTH_SHORT).show();
-
                     }
-                } else
-                    Toast.makeText(getApplicationContext(), "단기 예보 로드 실패", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @SuppressLint("SetTextI18n")
@@ -479,7 +543,6 @@ public class WeatherLocationActivity extends AppCompatActivity {
                 sky = item.wf7Am;
                 break;
         }
-//        System.out.println("getLowSky : " + sky);
         return sky;
     }
 
@@ -584,32 +647,11 @@ public class WeatherLocationActivity extends AppCompatActivity {
 //                    System.out.println("4일 오전 : " + item.rnSt4Am);
 //                    System.out.println("4일 오후 : " + item.rnSt4Pm);
 
-                    // 1일, 2일후 오전오후 강수랑 날씨는 어디서 받아올건데??? -> 일단 보류
+                    // UI 업데이트를 별도의 스레드에서 수행
+                    runOnUiThread(() -> {
+                        updateMedWeatherUI(item, medWeatherArr);
+                    });
 
-                    // 3~7일 후
-                    for (int i = 0; i < 4; i++) {
-                        medWeatherArr[i].setAm_rain(getAmRain(item, i + 4));
-                        medWeatherArr[i].setPm_rain(getPmRain(item, i + 4));
-                        medWeatherArr[i].setAm_sky(getAmSky(item, i + 4));
-                        medWeatherArr[i].setPm_sky(getPmSky(item, i + 4));
-
-//                        System.out.println(i + 3 + "번째 am_sky : " + getAmSky(item, i + 3));
-//                        System.out.println(i + 3 + "번째 pm_sky : " + getPmSky(item, i + 3));
-                    }
-
-                    // 8~10일 후
-                    medWeatherArr[4].setRain(item.rnSt8);
-                    medWeatherArr[4].setSky(item.wf8);
-                    medWeatherArr[5].setRain(item.rnSt9);
-                    medWeatherArr[5].setSky(item.wf9);
-                    medWeatherArr[6].setRain(item.rnSt10);
-                    medWeatherArr[6].setSky(item.wf10);
-
-//                    System.out.println("8번째 sky : " + medWeatherArr[4].getSky());
-//                    System.out.println("9번째 sky : " + medWeatherArr[5].getSky());
-//                    System.out.println("10번째 sky : " + medWeatherArr[6].getSky());
-
-                    rv_daily_simple.setAdapter(new DailyWeatherSimpleAdapter(medWeatherArr));
 
                     Toast.makeText(getApplicationContext(), "중기 육상 예보 로드 성공", Toast.LENGTH_SHORT).show();
                 }
@@ -630,19 +672,10 @@ public class WeatherLocationActivity extends AppCompatActivity {
                     List<med_temp_ITEM> items = Objects.requireNonNull(response.body()).response.body.items.item;
                     med_temp_ITEM item = items.get(0);
 
-//                    System.out.println("중기 기온 : " + response);
-
-                    // 1일, 2일후 최저,최고 기온은 어디서 받아올건데??? -> 일단 보류
-
-                    // 3~10일 후
-                    for (int i = 0; i < 7; i++) {
-                        medWeatherArr[i].setLow_temp(getLowTemp(item, i + 4));
-                        medWeatherArr[i].setHigh_temp(getHighTemp(item, i + 4));
-//                        System.out.println(i+4+"번째 최저 기온 : "+medWeatherArr[i].getLow_temp());
-//                        System.out.println((i+4+"번째 최고 기온  : "+medWeatherArr[i].getHigh_temp()));
-                    }
-
-                    rv_daily_simple.setAdapter(new DailyWeatherSimpleAdapter(medWeatherArr));
+                    // UI 업데이트를 별도의 스레드에서 수행
+                    runOnUiThread(() -> {
+                        updateMedTempUI(item, medWeatherArr);
+                    });
 
                     Toast.makeText(getApplicationContext(), "중기 예보 기온 로드 성공", Toast.LENGTH_SHORT).show();
                 }
@@ -654,6 +687,53 @@ public class WeatherLocationActivity extends AppCompatActivity {
                 Log.e("api fail", Objects.requireNonNull(t.getMessage()));
             }
         });
+    }
+
+    // UI 업데이트를 수행하는 메서드
+    private void updateMedWeatherUI(med_weather_ITEM item, MedWeatherModel[] medWeatherArr) {
+        // 1일, 2일후 오전오후 강수랑 날씨는 어디서 받아올건데??? -> 일단 보류
+
+
+        // 3~7일 후
+        for (int i = 0; i < 4; i++) {
+            medWeatherArr[i].setAm_rain(getAmRain(item, i + 4));
+            medWeatherArr[i].setPm_rain(getPmRain(item, i + 4));
+            medWeatherArr[i].setAm_sky(getAmSky(item, i + 4));
+            medWeatherArr[i].setPm_sky(getPmSky(item, i + 4));
+
+//                        System.out.println(i + 3 + "번째 am_sky : " + getAmSky(item, i + 3));
+//                        System.out.println(i + 3 + "번째 pm_sky : " + getPmSky(item, i + 3));
+        }
+
+        // 8~10일 후
+        medWeatherArr[4].setRain(item.rnSt8);
+        medWeatherArr[4].setSky(item.wf8);
+        medWeatherArr[5].setRain(item.rnSt9);
+        medWeatherArr[5].setSky(item.wf9);
+        medWeatherArr[6].setRain(item.rnSt10);
+        medWeatherArr[6].setSky(item.wf10);
+
+//                    System.out.println("8번째 sky : " + medWeatherArr[4].getSky());
+//                    System.out.println("9번째 sky : " + medWeatherArr[5].getSky());
+//                    System.out.println("10번째 sky : " + medWeatherArr[6].getSky());
+
+        rv_daily_simple.setAdapter(new DailyWeatherSimpleAdapter(medWeatherArr));
+
+    }
+
+    private void updateMedTempUI(med_temp_ITEM item, MedWeatherModel[] medWeatherArr) {
+        // 1일, 2일후 최저,최고 기온은 어디서 받아올건데??? -> 일단 보류
+
+        // 3~10일 후
+        for (int i = 0; i < 7; i++) {
+            medWeatherArr[i].setLow_temp(getLowTemp(item, i + 4));
+            medWeatherArr[i].setHigh_temp(getHighTemp(item, i + 4));
+//                        System.out.println(i+4+"번째 최저 기온 : "+medWeatherArr[i].getLow_temp());
+//                        System.out.println((i+4+"번째 최고 기온  : "+medWeatherArr[i].getHigh_temp()));
+        }
+
+        rv_daily_simple.setAdapter(new DailyWeatherSimpleAdapter(medWeatherArr));
+
     }
 
     // 지역 코드 가져오기
@@ -833,42 +913,43 @@ public class WeatherLocationActivity extends AppCompatActivity {
         return result;
     }
 
-    private String getBaseTime2() {
-        int hour = Integer.parseInt(new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis())));
-        int minute = Integer.parseInt(new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis())));
-
-        int baseHour = (hour / 3) * 3 + 2;
-
-        if (hour % 3 == 2 && minute >= 10) {
-            baseHour = (baseHour + 3) % 24;
-        }
-
-        return String.format("%02d00", baseHour);
-    }
-
-//     private String getBaseTime2() {
-//        String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis() - (1000 * 7200)));
-//        String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
-//        int check = ((Integer.parseInt(hour) / 3) * 3) + 2;
+//    private String getBaseTime2() {
+//        int hour = Integer.parseInt(new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis())));
+//        int minute = Integer.parseInt(new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis())));
 //
-//        // 10분 미만
-//        if ((Integer.parseInt(hour) - 2) % 3 == 0 && Integer.parseInt(minute) < 10) {
-//            check -= 3;
-//            if (check == -1)
-//                check = 23;
+//        int baseHour = (hour / 3) * 3 + 2;
+//
+//        if (hour % 3 == 2 && minute >= 10) {
+//            baseHour = (baseHour + 3) % 24;
 //        }
 //
-//        if (check < 10)
-//            hour = "0" + check + "00";
-//        else
-//            hour = check + "00";
-//        return hour;
+//        return String.format("%02d00", baseHour);
 //    }
+
+    private String getBaseTime2() {
+        @SuppressLint("SimpleDateFormat") String now = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis()));
+        @SuppressLint("SimpleDateFormat") String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis() - (1000 * 7200)));
+        @SuppressLint("SimpleDateFormat") String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
+        int check = ((Integer.parseInt(hour) / 3) * 3) + 2;
+
+        // 10분 미만
+        if ((Integer.parseInt(now)) % 3 == 2 && Integer.parseInt(minute) < 10) {
+            check -= 3;
+            if (check == -1)
+                check = 23;
+        }
+
+        if (check < 10)
+            hour = "0" + check + "00";
+        else
+            hour = check + "00";
+        return hour;
+    }
 
 
     private String getBaseTime3() {
-        String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis()));
-        String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
+        @SuppressLint("SimpleDateFormat") String hour = new SimpleDateFormat("HH").format(new Date(System.currentTimeMillis()));
+        @SuppressLint("SimpleDateFormat") String minute = new SimpleDateFormat("mm").format(new Date(System.currentTimeMillis()));
         int check = Integer.parseInt(hour);
 
         if (check < 6) { // 전날 18시

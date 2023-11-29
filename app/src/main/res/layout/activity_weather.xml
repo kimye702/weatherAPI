@@ -1,268 +1,288 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:openDrawer="start">
 
-    <LinearLayout
+    <!-- 메인 컨텐츠 -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#4B8AD4"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/include"
-            layout="@layout/weather_toolbar" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="20dp">
+            android:layout_height="wrap_content"
+            android:background="#4B8AD4"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_today_weather"
+            <include
+                android:id="@+id/include"
+                layout="@layout/weather_toolbar" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="맑음"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/ly_temp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-10dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_today_weather">
+                android:layout_height="match_parent"
+                android:padding="20dp">
 
                 <TextView
-                    android:id="@+id/tv_now_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="15"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="70sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_temp_symbol"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="°C"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="40sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ly_temps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ly_temp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="체감온도 : "
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tv_perceived_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:text="16°"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="2dp"
-                    android:src="@drawable/blue_triangle" />
-
-                <TextView
-                    android:id="@+id/tv_lowest_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:text="13°"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="2dp"
-                    android:src="@drawable/red_triangle" />
-
-                <TextView
-                    android:id="@+id/tv_highest_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="24°"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ly_temps">
-
-                <!--            <LinearLayout-->
-                <!--                android:id="@+id/ly_rv_very_short"-->
-                <!--                android:layout_width="match_parent"-->
-                <!--                android:layout_height="200dp"-->
-                <!--                android:orientation="vertical">-->
-
-                <!--                <androidx.recyclerview.widget.RecyclerView-->
-                <!--                    android:id="@+id/rv_very_short"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="match_parent" />-->
-                <!--            </LinearLayout>-->
-
-                <Button
-                    android:id="@+id/btn_finedust"
+                    android:id="@+id/tv_today_weather"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/shape_widget_background"
-                    android:text="오늘의 대기질" />
-
-                <!--            <Button-->
-                <!--                android:id="@+id/btn_very_short_weather"-->
-                <!--                android:layout_width="match_parent"-->
-                <!--                android:layout_height="wrap_content"-->
-                <!--                android:layout_marginVertical="10dp"-->
-                <!--                android:background="@drawable/shape_widget_background"-->
-                <!--                android:text="초단기 예보" />-->
+                    android:text="맑음"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
-                    android:id="@+id/ly_rv_very_short"
+                    android:id="@+id/ly_temp"
                     android:layout_width="match_parent"
-                    android:layout_height="270dp"
-                    android:background="@drawable/rounded_background"
-                    android:orientation="vertical"
-                    android:layout_marginTop="20dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="-10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_today_weather">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:id="@+id/tv_now_temp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:padding="10dp"
-                        android:text="초단기 예보"
+                        android:text="15"
+                        android:textAlignment="center"
                         android:textColor="@color/white"
-                        android:textSize="18sp"
+                        android:textSize="70sp"
                         android:textStyle="bold" />
 
+                    <TextView
+                        android:id="@+id/tv_temp_symbol"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="°C"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="40sp"
+                        android:textStyle="bold" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="2dp"
-                        android:background="@color/grey" />
+                </LinearLayout>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_very_short"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                <LinearLayout
+                    android:id="@+id/ly_temps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/ly_temp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="체감온도 : "
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tv_perceived_temp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="16°"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="2dp"
+                        android:src="@drawable/blue_triangle" />
+
+                    <TextView
+                        android:id="@+id/tv_lowest_temp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:text="13°"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="14dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="2dp"
+                        android:src="@drawable/red_triangle" />
+
+                    <TextView
+                        android:id="@+id/tv_highest_temp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="24°"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:background="@drawable/rounded_background"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="20dp">
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ly_temps">
 
-                    <TextView
+                    <!--            <LinearLayout-->
+                    <!--                android:id="@+id/ly_rv_very_short"-->
+                    <!--                android:layout_width="match_parent"-->
+                    <!--                android:layout_height="200dp"-->
+                    <!--                android:orientation="vertical">-->
+
+                    <!--                <androidx.recyclerview.widget.RecyclerView-->
+                    <!--                    android:id="@+id/rv_very_short"-->
+                    <!--                    android:layout_width="match_parent"-->
+                    <!--                    android:layout_height="match_parent" />-->
+                    <!--            </LinearLayout>-->
+
+                    <Button
+                        android:id="@+id/btn_finedust"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:padding="10dp"
-                        android:text="단기 예보"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/shape_widget_background"
+                        android:text="오늘의 대기질" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="2dp"
-                        android:background="@color/grey" />
+                    <!--            <Button-->
+                    <!--                android:id="@+id/btn_very_short_weather"-->
+                    <!--                android:layout_width="match_parent"-->
+                    <!--                android:layout_height="wrap_content"-->
+                    <!--                android:layout_marginVertical="10dp"-->
+                    <!--                android:background="@drawable/shape_widget_background"-->
+                    <!--                android:text="초단기 예보" />-->
 
                     <LinearLayout
-                        android:id="@+id/ly_rv_hour_simple"
+                        android:id="@+id/ly_rv_very_short"
                         android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:orientation="horizontal">
+                        android:layout_height="270dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/rounded_background"
+                        android:orientation="vertical">
 
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:padding="10dp"
+                            android:text="초단기 예보"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="2dp"
+                            android:background="@color/grey" />
 
                         <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_hour_simple"
-                            android:layout_width="wrap_content"
+                            android:id="@+id/rv_very_short"
+                            android:layout_width="match_parent"
                             android:layout_height="match_parent" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/rounded_background"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:padding="10dp"
+                            android:text="단기 예보"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="2dp"
+                            android:background="@color/grey" />
+
+                        <LinearLayout
+                            android:id="@+id/ly_rv_hour_simple"
+                            android:layout_width="match_parent"
+                            android:layout_height="150dp"
+                            android:orientation="horizontal">
+
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_hour_simple"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ly_rv_daily_simple"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="20dp"
+                        android:background="@drawable/rounded_background"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:padding="10dp"
+                            android:text="중기 예보"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="2dp"
+                            android:background="@color/grey" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rv_daily_simple"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never" />
                     </LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/ly_rv_daily_simple"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/rounded_background"
-                    android:orientation="vertical"
-                    android:layout_marginTop="20dp">
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:padding="10dp"
-                        android:text="중기 예보"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+    </androidx.core.widget.NestedScrollView>
 
+    <!-- 네비게이션 뷰 -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:itemTextColor="@color/black"
+        android:background="@android:color/white"
+        app:headerLayout="@layout/sidebar_header"
+        app:menu="@menu/sidebar_menu" />
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="2dp"
-                        android:background="@color/grey" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rv_daily_simple"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:nestedScrollingEnabled="false"
-                        android:overScrollMode="never" />
-                </LinearLayout>
-            </LinearLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </LinearLayout>
-
-</androidx.core.widget.NestedScrollView>
+</androidx.drawerlayout.widget.DrawerLayout>
