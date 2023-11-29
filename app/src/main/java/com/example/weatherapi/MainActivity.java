@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
 
-         //위치 업데이트를 위한 권한 체크 및 요청
+        //위치 업데이트를 위한 권한 체크 및 요청
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 101);
@@ -89,17 +89,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
-
                     case R.id.home:{
                         startActivity(new Intent(MainActivity.this, WeatherLocationActivity.class));
                     }
-//                    case R.id.chat_friend:{
-//                        getSupportFragmentManager().beginTransaction()
-//                                .replace(R.id.main_layout, chatFragment)
-//                                .commit();
-//                        return true;
-//                    }
-                    case R.id.friend:{
+
+                    case R.id.friend:
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_layout, friendFragment)
                                 .commit();

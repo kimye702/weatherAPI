@@ -23,7 +23,7 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             app:civ_border_overlay="true"
-            android:src="@drawable/friend"
+            android:src="@drawable/logo_border"
             android:layout_marginBottom="15dp"
             />
         <LinearLayout
@@ -68,22 +68,6 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/signup_button"
             />
-        <Button
-            android:id="@+id/signup_locate_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="위치 등록하기"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/signup_password"
-            />
-        <TextView
-            android:id="@+id/check_address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="위치확인"
-            >
-        </TextView>
         <Button
             android:id="@+id/signup_button"
             android:layout_width="wrap_content"
