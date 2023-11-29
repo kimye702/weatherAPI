@@ -71,6 +71,9 @@ dependencies {
     // 엑셀
     implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
 
+    // 사이드바
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.google.firebase:firebase-database:9.2.1'
     implementation("com.google.firebase:firebase-storage")
