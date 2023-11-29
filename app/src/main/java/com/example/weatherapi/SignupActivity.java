@@ -36,8 +36,8 @@ public class SignupActivity extends AppCompatActivity {
     private EditText signup_password;
     private EditText signup_name;
     private Button signup_button;
-    private Button check_button;
     private ImageView signup_profile;
+    private Button signup_location_button;
     private Uri imageUri;
     private String profile;
 
@@ -53,10 +53,9 @@ public class SignupActivity extends AppCompatActivity {
         signup_email=findViewById(R.id.signup_email);
         signup_password=findViewById(R.id.signup_password);
         signup_button=findViewById(R.id.signup_button);
-        check_button=findViewById(R.id.check_button);
-        check_button=findViewById(R.id.check_button);
         signup_profile=findViewById(R.id.signup_profile);
         signup_name=findViewById(R.id.signup_name);
+        signup_location_button=findViewById(R.id.signup_locate_button);
 
         signup_profile.setOnClickListener(new View.OnClickListener() {
 
@@ -65,6 +64,13 @@ public class SignupActivity extends AppCompatActivity {
                 Intent intent=new Intent(Intent.ACTION_PICK);
                 intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
                 startActivityForResult(intent, PICK_FROM_ALBUM);
+            }
+        });
+
+        signup_location_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
