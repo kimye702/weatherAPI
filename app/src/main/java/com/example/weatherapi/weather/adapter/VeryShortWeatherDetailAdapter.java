@@ -1,5 +1,7 @@
 package com.example.weatherapi.weather.adapter;
 
+import static java.lang.Math.pow;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +10,13 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.weatherapi.R;
 import com.example.weatherapi.weather.model.VeryShortWeatherModel;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 // 초단기 예보 활용 6시간이내 디테일
 public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShortWeatherDetailAdapter.ViewHolder> {
@@ -41,6 +48,10 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTime;
         private TextView tvRainType;
+        private TextView tvHourRain;
+        private TextView tvPerceivedTemp;
+        private TextView tvWind;
+        private LottieAnimationView lt_very_short_detail;
         private TextView tvHumidity;
         private TextView tvSky;
         private TextView tvTemp;
@@ -50,6 +61,10 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
             super(itemView);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvRainType = itemView.findViewById(R.id.tvRainType);
+            tvHourRain = itemView.findViewById(R.id.tvHourRain);
+            tvPerceivedTemp = itemView.findViewById(R.id.tvPerceivedTemp);
+            tvWind = itemView.findViewById(R.id.tvWind);
+            lt_very_short_detail = itemView.findViewById(R.id.lt_very_short_detail);
             tvHumidity = itemView.findViewById(R.id.tvHumidity);
             tvSky = itemView.findViewById(R.id.tvSky);
             tvTemp = itemView.findViewById(R.id.tvTemp);
@@ -59,11 +74,117 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
         public void setItem(VeryShortWeatherModel item) {
             tvTime.setText(item.getFcstTime());
             tvRainType.setText(getRainType(item.getRainType()));
-            tvHumidity.setText(item.getHumidity());
-            tvSky.setText(getSky(item.getSky()));
+            tvHourRain.setText(item.getHourRain());
+            tvPerceivedTemp.setText(getPerceivedTemp(item.getTemp(), item.getWindSpeed())+"°");
+            tvWind.setText(item.getWindSpeed()+"m/s");
+            lt_very_short_detail.setAnimation(getLottie(item.getFcstTime(),item.getSky(), item.getRainType()));
+            tvHumidity.setText(item.getHumidity()+"%");
+            tvSky.setText(getSky(item.getSky(), item.getRainType()));
             tvTemp.setText(item.getTemp() + "°");
-            tvRecommends.setText(getRecommends(Integer.parseInt(item.getTemp())));
+            tvRecommends.setText(getRecommends(Double.parseDouble(getPerceivedTemp(item.getTemp(),item.getWindSpeed()))));
         }
+    }
+
+    public String getPerceivedTemp(String temp, String wind) {
+        double T = Double.parseDouble(temp);
+        double V = Double.parseDouble(wind);
+
+        // 체감온도 공식
+        double result = 13.12+0.6251*T-11.37*pow(V,0.16)+0.3965*pow(V,0.16)*T;
+
+        // 체감온도를 소수점 첫째 자리까지 형식화
+        String formattedResult = String.format("%.1f", result);
+
+        return formattedResult;
+    }
+
+    public int getLottie(String time, String sky, String rain) {
+        boolean isAm = true; // 07~17 pm은 17~24, 00~05
+
+        int hour = Integer.parseInt(time.substring(0, 2));
+        if (hour > 17 || hour < 5)
+            isAm = false;
+
+        switch (sky) {
+            case "1":  // 맑음
+                switch (rain) {
+                    case "0": // 강수 없음
+                        if (isAm)
+                            return R.raw.am_sunny;
+                        else
+                            return R.raw.pm_sunny;
+
+                    case "1":
+                    case "2":
+                    case "5":
+                    case "6":
+                        if (isAm)
+                            return R.raw.am_cloud_rain;
+                        else
+                            return R.raw.pm_cloud_rain;
+
+                    case "3": // 눈
+                    case "7":
+                        if (isAm)
+                            return R.raw.am_cloud_snow;
+                        else
+                            return R.raw.pm_cloud_snow;
+                }
+                break;
+
+            case "3":  // 구름많음
+                switch (rain) {
+                    case "0": // 강수 없음
+                        if (isAm)
+                            return R.raw.am_cloud;
+                        else
+                            return R.raw.pm_cloud;
+
+                    case "1":
+                    case "2":
+                    case "5":
+                    case "6":
+                        if (isAm)
+                            return R.raw.am_cloud_rain;
+                        else
+                            return R.raw.pm_cloud_rain;
+
+                    case "3": // 눈
+                    case "7":
+                        if (isAm)
+                            return R.raw.am_cloud_snow;
+                        else
+                            return R.raw.pm_cloud_snow;
+                }
+                break;
+
+            case "4":  // 흐림
+                switch (rain) {
+                    case "0": // 강수 없음
+                        return R.raw.blur; // 기본 흐림
+
+                    case "1":
+                    case "2":
+                    case "5":
+                    case "6":
+                        if (isAm)
+                            return R.raw.am_cloud_rain;
+                        else
+                            return R.raw.pm_cloud_rain;
+
+                    case "3": // 눈
+                    case "7":
+                        if (isAm)
+                            return R.raw.am_cloud_snow;
+                        else
+                            return R.raw.pm_cloud_snow;
+                }
+                break;
+
+            default:  // 오류
+                return R.raw.warning;
+        }
+        return R.raw.warning;
     }
 
     public String getRainType(String rainType) {
@@ -76,25 +197,83 @@ public class VeryShortWeatherDetailAdapter extends RecyclerView.Adapter<VeryShor
                 return "비/눈";
             case "3":
                 return "눈";
+            case "5":
+                return "빗방울";
+            case "6":
+                return "빗방울, 눈날림";
+            case "7":
+                return "눈날림";
             default:
                 return "오류 rainType : " + rainType;
         }
     }
 
-    public String getSky(String sky) {
+    public String getSky(String sky, String rain) {
         switch (sky) {
-            case "1":
-                return "맑음";
-            case "3":
-                return "구름 많음";
-            case "4":
-                return "흐림";
-            default:
-                return "오류 rainType : " + sky;
+            case "1":  // 맑음
+                switch (rain) {
+                    case "0": // 강수 없음
+                        return "맑음";
+
+                    case "1":
+                    case "2":
+                        return "비";
+
+                    case "3":
+                        return "눈";
+
+                    case "5":
+                    case "6":
+                    case "7":
+                        return "대체로 맑음";
+                }
+                break;
+
+            case "3":  // 구름많음
+                switch (rain) {
+                    case "0": // 강수 없음
+                        return "구름 많음";
+
+                    case "1":
+                    case "2":
+                        return "구름 많고 비";
+
+                    case "3": // 눈
+                       return "구름 많고 눈";
+
+                    case "5":
+                    case "6":
+                    case "7":
+                        return "대체로 구름 많음";
+                }
+                break;
+
+            case "4":  // 흐림
+                switch (rain) {
+                    case "0": // 강수 없음
+                        return "흐림";
+
+                    case "1":
+                    case "2":
+                        return "흐리고 비";
+
+                    case "3": // 눈
+                       return "흐리고 눈";
+
+                    case "5":
+                    case "6":
+                    case "7":
+                        return "대체로 흐림";
+                }
+                break;
+
+            default:  // 오류
+                return "알 수 없음";
         }
+        return "알 수 없음";
     }
 
-    public String getRecommends(int temp) {
+    public String getRecommends(double temp) {
         if (temp >= 5 && temp <= 8) {
             return "울 코트, 가죽 옷, 기모";
         } else if (temp >= 9 && temp <= 11) {

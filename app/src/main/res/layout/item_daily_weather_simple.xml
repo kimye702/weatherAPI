@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/item_daily_weather_simple"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="75dp"
     android:gravity="center"
     android:orientation="horizontal"
     android:padding="15dp"
@@ -18,20 +18,21 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_daily_day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="일"
-            android:textColor="@color/white"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/tv_daily_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:text="11/27" />
+
+        <TextView
+            android:id="@+id/tv_daily_day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="일"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textAlignment="center"/>
     </LinearLayout>
 
 
@@ -59,25 +60,34 @@
         android:textStyle="bold"
         tools:text="대체로 흐림" />
 
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/blue_triangle"
+        android:layout_marginRight="2dp"/>
+
     <TextView
         android:id="@+id/tv_daily_low_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:textAlignment="center"
-        android:textColor="#2196F3"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        android:textStyle="bold"
-        tools:text="4°" />
+        tools:text="4°"
+        android:layout_marginRight="5dp"/>
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/red_triangle"
+        android:layout_marginRight="2dp"/>
 
     <TextView
         android:id="@+id/tv_daily_high_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="10°"
         android:textAlignment="center"
-        android:textColor="#F44336"
-        android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textColor="@color/white"
+        android:textSize="16sp" />
 </LinearLayout>

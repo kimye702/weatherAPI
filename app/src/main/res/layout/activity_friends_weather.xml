@@ -144,13 +144,13 @@
                 <!--                    android:layout_height="match_parent" />-->
                 <!--            </LinearLayout>-->
 
-                <Button
-                    android:id="@+id/btn_finedust"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:background="@drawable/shape_widget_background"
-                    android:text="오늘의 대기질" />
+<!--                <Button-->
+<!--                    android:id="@+id/btn_finedust"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="20dp"-->
+<!--                    android:background="@drawable/shape_widget_background"-->
+<!--                    android:text="오늘의 대기질" />-->
 
                 <!--            <Button-->
                 <!--                android:id="@+id/btn_very_short_weather"-->
@@ -163,7 +163,7 @@
                 <LinearLayout
                     android:id="@+id/ly_rv_very_short"
                     android:layout_width="match_parent"
-                    android:layout_height="270dp"
+                    android:layout_height="260dp"
                     android:background="@drawable/rounded_background"
                     android:orientation="vertical"
                     android:layout_marginTop="20dp">

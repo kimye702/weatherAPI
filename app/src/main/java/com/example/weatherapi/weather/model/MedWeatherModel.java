@@ -3,17 +3,17 @@ package com.example.weatherapi.weather.model;
 import java.time.LocalDate;
 import java.util.Calendar;
 
-// 리사이클러뷰에 들어갈 내용
+// 중기 예보 정보
 public class MedWeatherModel {
     private LocalDate date;
-    private String low_temp;
-    private String high_temp;
-    private String am_rain;
-    private String pm_rain;
-    private String rain;
-    private String am_sky;
-    private String pm_sky;
-    private String sky;
+    private String low_temp; // 최저 기온
+    private String high_temp; // 최고 기온
+    private String am_rain; // 오전 강수량
+    private String pm_rain; // 오후 강수량
+    private String rain; // 1시간 강수량
+    private String am_sky; // 오전 하늘 상태
+    private String pm_sky; // 오후 하늘 상태
+    private String sky; // 하늘 상태
 
     public LocalDate getDate() {
         return date;

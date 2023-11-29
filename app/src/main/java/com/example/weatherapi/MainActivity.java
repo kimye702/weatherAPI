@@ -89,11 +89,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
-                    case R.id.home:
-                        startActivity(new Intent(MainActivity.this, WeatherLocationActivity.class));
-                        break; // 각 경우에 break 문을 추가합니다.
 
-                    case R.id.friend:
+                    case R.id.home:{
+                        startActivity(new Intent(MainActivity.this, WeatherLocationActivity.class));
+                    }
+//                    case R.id.chat_friend:{
+//                        getSupportFragmentManager().beginTransaction()
+//                                .replace(R.id.main_layout, chatFragment)
+//                                .commit();
+//                        return true;
+//                    }
+                    case R.id.friend:{
                         getSupportFragmentManager().beginTransaction()
                                 .replace(R.id.main_layout, friendFragment)
                                 .commit();

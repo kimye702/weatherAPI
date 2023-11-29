@@ -77,17 +77,12 @@ public class DailyWeatherSimpleAdapter extends RecyclerView.Adapter<DailyWeather
             tv_daily_date.setText(getDate(item.getDate()));
             lt_daily_weather.setAnimation(getLottie(isAm(),getSky(isAm(), item)));
             tv_daily_weather.setText(getSky(isAm(), item));
-            tv_daily_low_temp.setText(item.getLow_temp());
-            tv_daily_high_temp.setText(item.getHigh_temp());
+            tv_daily_low_temp.setText(item.getLow_temp()+"°");
+            tv_daily_high_temp.setText(item.getHigh_temp()+"°");
         }
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
     public boolean isAm(){
-//        LocalDate now = LocalDate.now(); // 현재 날짜
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh");
-//        int hour = Integer.parseInt(now.format(formatter).toString());
-
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
 
@@ -105,7 +100,7 @@ public class DailyWeatherSimpleAdapter extends RecyclerView.Adapter<DailyWeather
             return "오늘";
         else {
             DayOfWeek dayOfWeek = date.getDayOfWeek(); // 요일 얻기
-            return dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()); // 짧은 형태의 요일 반환
+            return dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault()); // 짧은 형태의 요일 반환
         }
     }
 
@@ -115,10 +110,8 @@ public class DailyWeatherSimpleAdapter extends RecyclerView.Adapter<DailyWeather
         return date.format(dateFormatter);
     }
 
-//    @RequiresApi(api = Build.VERSION_CODES.O)
     public int getLottie(boolean isAm, String sky) {
         if (sky == null) {
-            // sky가 null이면 기본값으로 처리 또는 예외를 throw 등의 적절한 처리를 추가할 수 있습니다.
             return R.raw.warning;
         }
 
@@ -158,8 +151,6 @@ public class DailyWeatherSimpleAdapter extends RecyclerView.Adapter<DailyWeather
     }
 
     public String getSky(boolean isAm, MedWeatherModel item) {
-
-
         if(isAm)
             if(item.getAm_sky()==null)
                 return item.getSky();

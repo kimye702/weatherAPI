@@ -1,7 +1,5 @@
 package com.example.weatherapi.finedust;
 
-import static com.example.weatherapi.finedust.Repository.getNearbyMonitoringStation;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -28,8 +26,6 @@ import com.example.weatherapi.databinding.AirQualityItemBinding;
 import com.example.weatherapi.finedust.model.airquality.Grade;
 import com.example.weatherapi.finedust.model.airquality.MeasuredValue;
 import com.example.weatherapi.finedust.model.monitoringstation.MonitoringStation;
-import com.example.weatherapi.finedust_test.KakaoApiTest;
-import com.example.weatherapi.weather.util.Conversion;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -273,7 +269,6 @@ public class FineDustActivity extends AppCompatActivity {
                 .alpha(1f)
                 .start();
 
-        // 지오코더가 동작 안하는듯?
         List<Address> addressList = getAddress(location.getLatitude(), location.getLongitude());
         if (!addressList.isEmpty()) {
             Address address = addressList.get(0);
@@ -284,11 +279,11 @@ public class FineDustActivity extends AppCompatActivity {
 
         binding.measuringStationAddress.setText("측정소 위치: " + monitoringStation.getAddr());
 
-        // 계속 null로 반환됨 뭔가 이상함 전체 grade 모두 이상함
         Grade grade = measuredValue.getGrade(measuredValue.getKhaiGrade());
         binding.getRoot().setBackgroundResource(grade.getColorResId());
         binding.totalGraddeLabelTextView.setText(grade.getLabel());
         binding.totalGradeEmojiTextView.setText(grade.getEmoji());
+//        binding.lvFinedustTotal.setAnimation(grade.getEmoji());
 
         binding.fineDustInformationTextView.setText("미세먼지: " + measuredValue.getPm10Value() + " ㎍/㎥ " +
                 (measuredValue.getGrade(measuredValue.getPm10Grade()).getEmoji()));
