@@ -21,6 +21,7 @@ import com.example.weatherapi.classInfo.UserInfo;
 import com.example.weatherapi.weather.WeatherLocationActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     private LocationListener locationListener;
     private DatabaseReference databaseReference;
     private String userId;
+
+    // 구글 애널리틱스
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,13 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        // 구글 애널리틱스
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "화면 이름");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "클래스 이름");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
 

@@ -20,6 +20,7 @@ import com.example.weatherapi.classInfo.UserInfo;
 import com.example.weatherapi.weather.WeatherLocationActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,6 +34,9 @@ public class SetLocationActivity extends AppCompatActivity {
     private Button setLocationButton;
 
     private boolean isLocationUpdated = false; // 추가
+
+    // 구글 애널리틱스
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,6 +81,13 @@ public class SetLocationActivity extends AppCompatActivity {
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         }
+
+        // 구글 애널리틱스
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "화면 이름");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "클래스 이름");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
 

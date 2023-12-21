@@ -30,6 +30,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +44,9 @@ public class FineDustActivity extends AppCompatActivity {
 
     private ActivityFinedustBinding binding;
 
+    // 구글 애널리틱스
+    private FirebaseAnalytics mFirebaseAnalytics;
+
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,13 @@ public class FineDustActivity extends AppCompatActivity {
         initVariables();
         requestLocationPermission();
         binding.refresh.setOnRefreshListener(() -> fetchAirQualityData());
+
+        // 구글 애널리틱스
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "화면 이름");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "클래스 이름");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
     @Override
@@ -78,19 +89,20 @@ public class FineDustActivity extends AppCompatActivity {
             if (!locationPermissionGranted) {
                 finish();
             } else {
-                boolean backgroundLocationPermissionGranted =
-                        ActivityCompat.checkSelfPermission(
-                                this,
-                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED;
-                boolean shouldShowBackgroundPermissionRationale =
-                        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-
-                if (!backgroundLocationPermissionGranted && shouldShowBackgroundPermissionRationale) {
-                    showBackgroundLocationPermissionRationaleDialog();
-                } else {
-                    fetchAirQualityData();
-                }
+//                boolean backgroundLocationPermissionGranted =
+//                        ActivityCompat.checkSelfPermission(
+//                                this,
+//                                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+//                        ) == PackageManager.PERMISSION_GRANTED;
+//                boolean shouldShowBackgroundPermissionRationale =
+//                        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+//
+//                if (!backgroundLocationPermissionGranted && shouldShowBackgroundPermissionRationale) {
+//                    showBackgroundLocationPermissionRationaleDialog();
+//                } else {
+//                    fetchAirQualityData();
+//                }
+                fetchAirQualityData();
             }
         } else {
             if (!locationPermissionGranted) {
@@ -101,20 +113,20 @@ public class FineDustActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    private void showBackgroundLocationPermissionRationaleDialog() {
-        new AlertDialog.Builder(this)
-                .setMessage("홈 위젯을 사용하려면 위치 접근 권한이 " + getPackageManager().getBackgroundPermissionOptionLabel() + " 상태여야 합니다.")
-                .setPositiveButton("설정하기", (dialog, which) -> {
-                    requestBackgroundLocationPermissions();
-                    dialog.dismiss();
-                })
-                .setNegativeButton("그냥두기", (dialog, which) -> {
-                    fetchAirQualityData();
-                    dialog.dismiss();
-                })
-                .show();
-    }
+//    @RequiresApi(Build.VERSION_CODES.R)
+//    private void showBackgroundLocationPermissionRationaleDialog() {
+//        new AlertDialog.Builder(this)
+//                .setMessage("홈 위젯을 사용하려면 위치 접근 권한이 " + getPackageManager().getBackgroundPermissionOptionLabel() + " 상태여야 합니다.")
+//                .setPositiveButton("설정하기", (dialog, which) -> {
+//                    requestBackgroundLocationPermissions();
+//                    dialog.dismiss();
+//                })
+//                .setNegativeButton("그냥두기", (dialog, which) -> {
+//                    fetchAirQualityData();
+//                    dialog.dismiss();
+//                })
+//                .show();
+//    }
 
     @RequiresApi(Build.VERSION_CODES.R)
     private void requestBackgroundLocationPermissions() {
