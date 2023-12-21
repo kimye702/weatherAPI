@@ -96,7 +96,7 @@ public class FineDustActivity extends AppCompatActivity {
 //                        ) == PackageManager.PERMISSION_GRANTED;
 //                boolean shouldShowBackgroundPermissionRationale =
 //                        ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-//
+
 //                if (!backgroundLocationPermissionGranted && shouldShowBackgroundPermissionRationale) {
 //                    showBackgroundLocationPermissionRationaleDialog();
 //                } else {
