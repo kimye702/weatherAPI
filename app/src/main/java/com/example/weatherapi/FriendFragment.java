@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -58,7 +59,7 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
-public class FriendFragment extends Fragment {
+public class FriendFragment extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -73,20 +74,22 @@ public class FriendFragment extends Fragment {
     ConstraintLayout constraintKakao;
 
 
-    @Nullable
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.friendlist, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_friendlist);
-        recyclerView.setLayoutManager(new LinearLayoutManager(inflater.getContext()));
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.friendlist);
+
+        RecyclerView recyclerView = findViewById(R.id.recycler_friendlist);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         FriendAdapter friendAdapter = new FriendAdapter();
         recyclerView.setAdapter(friendAdapter);
 
-        plusFriend=view.findViewById(R.id.plus_friend);
+        plusFriend=findViewById(R.id.plus_friend);
 
-        View bottomview = inflater.inflate(R.layout.add_bottom_sheet, null, false);
-        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        View bottomview = getLayoutInflater().inflate(R.layout.add_bottom_sheet, null, false);
+        final BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
         bottomSheetDialog.setContentView(bottomview);
 
         constraintCode=bottomview.findViewById(R.id.constraint_code);
@@ -123,12 +126,12 @@ public class FriendFragment extends Fragment {
             }
         });
 
-        KakaoSdk.init(getActivity(), getString(R.string.kakao_app_key));
+        KakaoSdk.init(FriendFragment.this, getString(R.string.kakao_app_key));
 
         constraintKakao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                KakaoLink(getContext());
+                KakaoLink(FriendFragment.this);
             }
         });
 
@@ -152,7 +155,7 @@ public class FriendFragment extends Fragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             friendAdapter.loadUserModels(); // 업데이트 호출
-                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(FriendFragment.this, "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
                                                         }
                                                     });
                                         }
@@ -163,17 +166,17 @@ public class FriendFragment extends Fragment {
                                                         @Override
                                                         public void onSuccess(Void aVoid) {
                                                             friendAdapter.loadUserModels(); // 업데이트 호출
-                                                            Toast.makeText(getActivity(), "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(FriendFragment.this, "친구 등록에 성공했어요!", Toast.LENGTH_LONG).show();
                                                         }
                                                     });
                                         } else {
-                                            Toast.makeText(getActivity(), "이미 추가된 친구입니다.", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(FriendFragment.this, "이미 추가된 친구입니다.", Toast.LENGTH_LONG).show();
                                         }
                                     } else {
-                                        Toast.makeText(getActivity(), "존재하지 않는 친구코드에요!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(FriendFragment.this, "존재하지 않는 친구코드에요!", Toast.LENGTH_LONG).show();
                                     }
                                 } else {
-                                    Toast.makeText(getActivity(), "오류 발생: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(FriendFragment.this, "오류 발생: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             }
                         });
@@ -213,9 +216,6 @@ public class FriendFragment extends Fragment {
                         });
             }
         });
-
-
-        return view;
     }
 
     public void KakaoLink(Context context) {
@@ -291,7 +291,7 @@ public class FriendFragment extends Fragment {
             storageRef.child("profileImage/"+userInfo.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    Glide.with(getContext()).load(uri).circleCrop().into(imageView);
+                    Glide.with(FriendFragment.this).load(uri).circleCrop().into(imageView);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -308,8 +308,8 @@ public class FriendFragment extends Fragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    View friendSheetView = LayoutInflater.from(getContext()).inflate(R.layout.friend_bottom_sheet, null, false);
-                    BottomSheetDialog friendSheetDialog = new BottomSheetDialog(getContext());
+                    View friendSheetView = LayoutInflater.from(FriendFragment.this).inflate(R.layout.friend_bottom_sheet, null, false);
+                    BottomSheetDialog friendSheetDialog = new BottomSheetDialog(FriendFragment.this);
                     friendSheetDialog.setContentView(friendSheetView);
 
                     ConstraintLayout friendWeather = friendSheetView.findViewById(R.id.weather_friend);
@@ -320,7 +320,7 @@ public class FriendFragment extends Fragment {
                     storageRef.child("profileImage/"+userModels.get(position).getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            Glide.with(getContext()).load(uri).circleCrop().into(friendImage);
+                            Glide.with(FriendFragment.this).load(uri).circleCrop().into(friendImage);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -335,7 +335,7 @@ public class FriendFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             Log.d(TAG, "Weather clicked for position: " + position);
-                            Intent intent = new Intent(getContext(), getLocationActivity.class);
+                            Intent intent = new Intent(FriendFragment.this, getLocationActivity.class);
                             intent.putExtra("friendUid", userModels.get(holder.getAdapterPosition()).getUid());
                             startActivity(intent);
                         }
@@ -345,7 +345,7 @@ public class FriendFragment extends Fragment {
                         @Override
                         public void onClick(View v) {
                             Log.d(TAG, "Chat clicked for position: " + position);
-                            Intent intent = new Intent(getContext(), ChatWindowActivity.class);
+                            Intent intent = new Intent(FriendFragment.this, ChatWindowActivity.class);
                             intent.putExtra("friendUid", userModels.get(holder.getAdapterPosition()).getUid());
                             startActivity(intent);
                         }
@@ -358,7 +358,7 @@ public class FriendFragment extends Fragment {
             friendWeather.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getContext(), getLocationActivity.class);
+                    Intent intent = new Intent(FriendFragment.this, getLocationActivity.class);
                     intent.putExtra("friendUid", userModels.get(position).getUid());
                     startActivity(intent);
                 }
@@ -367,7 +367,7 @@ public class FriendFragment extends Fragment {
             friendChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(getContext(), ChatWindowActivity.class);
+                    Intent intent = new Intent(FriendFragment.this, ChatWindowActivity.class);
                     intent.putExtra("friendUid", userModels.get(position).getUid());
                     startActivity(intent);
                 }

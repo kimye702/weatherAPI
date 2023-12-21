@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.weatherapi.classInfo.UserInfo;
+import com.example.weatherapi.weather.WeatherLocationActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -60,7 +61,7 @@ public class SigninActivity extends AppCompatActivity {
             auto_check = pref.getString("check",""); //name이라는 키 값으로 받는 것.
             if (mAuth.getCurrentUser() != null && auto_check.equals("true")) {
                 // User is signed in (getCurrentUser() will be null if not signed in)
-                Intent intent = new Intent(SigninActivity.this, MainActivity.class);
+                Intent intent = new Intent(SigninActivity.this, WeatherLocationActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
                 finish();
@@ -91,7 +92,7 @@ public class SigninActivity extends AppCompatActivity {
                                                 startActivity(intent);
                                                 finish();
                                             } else {
-                                                Intent intent = new Intent(SigninActivity.this, MainActivity.class);
+                                                Intent intent = new Intent(SigninActivity.this, WeatherLocationActivity.class);
                                                 startActivity(intent);
                                                 finish();
                                             }

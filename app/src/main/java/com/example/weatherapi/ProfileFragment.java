@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -34,7 +35,7 @@ import java.util.zip.Inflater;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends AppCompatActivity {
     private Button logoutButton;
     private FirebaseAuth mFirebaseAuth; //파이어베이스 인증
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -44,19 +45,18 @@ public class ProfileFragment extends Fragment {
     private CircleImageView myImage;
     private TextView myName;
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.profile, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.profile);
 
-        logoutButton=view.findViewById(R.id.logout_button);
-        myImage=view.findViewById(R.id.my_image);
-        myName=view.findViewById(R.id.my_name);
+        logoutButton=findViewById(R.id.logout_button);
+        myImage=findViewById(R.id.my_image);
+        myName=findViewById(R.id.my_name);
 
         storageRef.child("profileImage/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                Glide.with(getContext()).load(uri).circleCrop().into(myImage);
+                Glide.with(ProfileFragment.this).load(uri).circleCrop().into(myImage);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -86,15 +86,13 @@ public class ProfileFragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences pref = getContext().getSharedPreferences("pref", Activity.MODE_PRIVATE);
+                SharedPreferences pref = (ProfileFragment.this).getSharedPreferences("pref", Activity.MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit(); //Editor라는 Inner class가 정의되어 있음
                 editor.putString("check", "false");
                 editor.commit();//이 때 이제 저장이 되는 거임
                 mFirebaseAuth.signOut();
-                getActivity().finish();
+                finish();
             }
         });
-
-        return view;
     }
 }

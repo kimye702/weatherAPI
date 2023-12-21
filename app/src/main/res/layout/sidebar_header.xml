@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:background="@color/cardview_dark_background"
+    android:background="#4B8AD4"
     android:gravity="center"
     android:orientation="vertical"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
@@ -12,7 +12,8 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Side NavBar"
+        android:text="Weather Where"
+        android:textStyle="bold"
         android:textSize="30dp" />
 
 </LinearLayout>

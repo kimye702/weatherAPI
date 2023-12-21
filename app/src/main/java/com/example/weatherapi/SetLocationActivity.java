@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.weatherapi.classInfo.UserInfo;
+import com.example.weatherapi.weather.WeatherLocationActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -96,7 +97,7 @@ public class SetLocationActivity extends AppCompatActivity {
                     setLocationButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            Intent intent=new Intent(SetLocationActivity.this, MainActivity.class);
+                            Intent intent=new Intent(SetLocationActivity.this, WeatherLocationActivity.class);
                             startActivity(intent);
                             //finish();
                         }

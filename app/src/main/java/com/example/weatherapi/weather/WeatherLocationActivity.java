@@ -40,6 +40,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.weatherapi.FriendFragment;
+import com.example.weatherapi.ProfileFragment;
 import com.example.weatherapi.R;
 import com.example.weatherapi.finedust.FineDustActivity;
 import com.example.weatherapi.weather.adapter.DailyWeatherSimpleAdapter;
@@ -140,13 +142,15 @@ public class WeatherLocationActivity extends AppCompatActivity {
             // 클릭된 아이템에 대한 동작 처리
             switch (item.getItemId()) {
                 case R.id.nav_item1:
-                    // 네비게이션 메뉴 1 선택 시 동작
+                    Intent intent = new Intent(WeatherLocationActivity.this, FriendFragment.class);
+                    startActivity(intent);
                     break;
                 case R.id.nav_item2:
-                    // 네비게이션 메뉴 2 선택 시 동작
+                    Intent intent1 = new Intent(WeatherLocationActivity.this, ProfileFragment.class);
+                    startActivity(intent1);
                     break;
-                case R.id.nav_item3:
-                    break;
+//                case R.id.nav_item3:
+//                    break;
                 // 다른 메뉴 아이템들에 대한 처리 추가
             }
 
