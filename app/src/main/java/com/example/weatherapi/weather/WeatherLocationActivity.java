@@ -61,6 +61,7 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,6 +114,9 @@ public class WeatherLocationActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private ImageView nav_icon;
+
+    // 구글 애널리틱스
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
@@ -212,6 +216,13 @@ public class WeatherLocationActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // 구글 애널리틱스
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "화면 이름");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "클래스 이름");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
     private void openNavigationDrawer() {
